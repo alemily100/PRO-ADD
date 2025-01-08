@@ -44,7 +44,7 @@ pro_list<- list(pro.schedule=2,beta_shape_sc=pro.scen[[scenario]], beta_rate_sc=
 eff_list<- list(eff.schedule=c(8,16), eff_rates=eff.scen[[scenario]], beta_a=0.1, beta_b=0.9, min_eff=0.1, interim_complete_cohort1=6,
                 interim_complete_cohort2=12)
 data.after.dlt<- TRUE
-n.sim<-2
+n.sim<-1000
 cl <- makeCluster(detectCores())
 clusterSetRNGStream(cl,1915)
 invisible(clusterEvalQ(cl,{
@@ -103,25 +103,25 @@ for(i in 1:n.sim){
 
 if(data.after.dlt==FALSE){
   #write.csv(final.rec/n.sim, paste0("/results/sens.sc",scenario,".", mtd,".60.r.csv"))
-  write.csv(efficacy.estimate, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.e.csv"))
-  write.csv(pro.estimate, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.p.csv"))
-  write.csv(loss, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.l.csv"))
-  write.csv(n.patient.allocated, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.n.csv"))
-  write.csv(admiss, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.a.csv"))
-  write.csv(mtd.rec, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.mr.csv"))
-  write.csv(mtd.prob, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.mp.csv"))
-  write.csv(ncens, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.ncens.csv"))
-  write.csv(ndlt, paste0("/home/ealger/mayo/results/sens.sc",scenario,".", mtd,".60.ndlt.csv"))
+  write.csv(efficacy.estimate, paste0("/sens.sc",scenario,".", mtd,".60.e.csv"))
+  write.csv(pro.estimate, paste0("/sens.sc",scenario,".", mtd,".60.p.csv"))
+  write.csv(loss, paste0("/sens.sc",scenario,".", mtd,".60.l.csv"))
+  write.csv(n.patient.allocated, paste0("/sens.sc",scenario,".", mtd,".60.n.csv"))
+  write.csv(admiss, paste0("/sens.sc",scenario,".", mtd,".60.a.csv"))
+  write.csv(mtd.rec, paste0("/sens.sc",scenario,".", mtd,".60.mr.csv"))
+  write.csv(mtd.prob, paste0("/sens.sc",scenario,".", mtd,".60.mp.csv"))
+  write.csv(ncens, paste0("/sens.sc",scenario,".", mtd,".60.ncens.csv"))
+  write.csv(ndlt, paste0("/sens.sc",scenario,".", mtd,".60.ndlt.csv"))
 }else{
 #write.csv(final.rec/n.sim, paste0("sc",scenario,".", mtd,".60.r.csv"))
-write.csv(efficacy.estimate, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.e.csv"))
-write.csv(pro.estimate, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.p.csv"))
-write.csv(loss, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.l.csv"))
-write.csv(n.patient.allocated, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.n.csv"))
-write.csv(admiss, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.a.csv"))
-write.csv(mtd.rec, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.mr.csv"))
-write.csv(mtd.prob, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.mp.csv"))
-write.csv(ncens, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.ncens.csv"))
-write.csv(ndlt, paste0("/home/ealger/mayo/results/sc",scenario,".", mtd,".60.ndlt.csv"))
+write.csv(efficacy.estimate, paste0("/sc",scenario,".", mtd,".60.e.csv"))
+write.csv(pro.estimate, paste0("/sc",scenario,".", mtd,".60.p.csv"))
+write.csv(loss, paste0("/sc",scenario,".", mtd,".60.l.csv"))
+write.csv(n.patient.allocated, paste0("/sc",scenario,".", mtd,".60.n.csv"))
+write.csv(admiss, paste0("/sc",scenario,".", mtd,".60.a.csv"))
+write.csv(mtd.rec, paste0("/sc",scenario,".", mtd,".60.mr.csv"))
+write.csv(mtd.prob, paste0("/sc",scenario,".", mtd,".60.mp.csv"))
+write.csv(ncens, paste0("/sc",scenario,".", mtd,".60.ncens.csv"))
+write.csv(ndlt, paste0("/sc",scenario,".", mtd,".60.ndlt.csv"))
 }
 }

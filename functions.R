@@ -85,6 +85,7 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
   return(list(M,dosage))
 }
 
+
 #########################################################
 
 #Description: Provide new dose recommendation as per boin following first futility assessment 
@@ -362,6 +363,7 @@ pipe_est<- function(eff_data,e, a, b, n_t_grid){
   return(prob)
 }
 
+
 ##########################
 
 #Description: Samples from the posterior estimates of probability of efficacy as per iPipe design
@@ -400,7 +402,7 @@ loss.all<- function(pro_data, assessment.time.point, n.iter, runin.prop, n.dose,
   pro<- pro_estimate.all(pro_data, assessment.time.point, n.iter, runin.prop, n.dose)
   pro_sample<- sapply(1:n.dose, function(k) rbeta(n.sim.final,pro[[1]][k]*pro[[2]],(1-pro[[1]][k])*pro[[2]]))
   eff<-eff_estimate_sim(eff_data, alpha, beta, n.sim.final)
-  eff.est<-pipe_est(eff_data,0.5,alpha, beta, 100)
+  eff.est<-colMeans(eff)
   loss.val<- matrix(nrow=n.sim.final, ncol=n.dose)
   for(i in 1:n.sim.final){
     loss.val[i,]<- ((pro_sample[i,]^2) + (eff[i,]-1)^2)^(1/2)
@@ -466,6 +468,7 @@ final.recommendation.all<- function(pro_data, assessment.time.point, n.iter, run
 
 ##################
 
+
 #Description: find admissible doses as per safety stopping rule
 
 #Inputs:
@@ -490,32 +493,32 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
 
 #Inputs:
 #general_ls: list containing all general parameters
-    # n.patient.cohort: number of patients at each cohort
-    # first.week.assessed: first week DLTs are assessed (week 4 in this paper)
-    # between.cohort.wk: the number of weeks between cohort recruitment (week 4 in this paper)
-    # n.doses: number of doses
-    # n.timepoints: Number of timepoints (other than baseline) when PRO data is collected
-    # final.assessment.timepoint: final time point at which to estimate PRO-nAE burden score 
-    # mcmc.niter: Number of iterations of rjags to run 
-    # mcmc.burnin.prop: Proportion of n.iter to be runin
-    # n.cohorts.all:Number of cohorts included in trial
-    # n.sim.final: number of samples to collect from the posterior distribution
-    # cop.corr: correlation parameter for copula 
+# n.patient.cohort: number of patients at each cohort
+# first.week.assessed: first week DLTs are assessed (week 4 in this paper)
+# between.cohort.wk: the number of weeks between cohort recruitment (week 4 in this paper)
+# n.doses: number of doses
+# n.timepoints: Number of timepoints (other than baseline) when PRO data is collected
+# final.assessment.timepoint: final time point at which to estimate PRO-nAE burden score 
+# mcmc.niter: Number of iterations of rjags to run 
+# mcmc.burnin.prop: Proportion of n.iter to be runin
+# n.cohorts.all:Number of cohorts included in trial
+# n.sim.final: number of samples to collect from the posterior distribution
+# cop.corr: correlation parameter for copula 
 
 
 #boin_ls: list containing all dose-escalation parameters (Stage 1)
-    # cdlt_rates: vector of true DLT rates for each dose
-    # esc_bound:escalation threshold as per BOIN
-    # des_bound: de-escalation threshold as per BOIN
-    # target: target DLT rate
-    # beta_a_safety: shape parameter for prior as per safety stopping rule 
-    # beta_b_safety: rate parameter for prior as per safety stopping rule 
+# cdlt_rates: vector of true DLT rates for each dose
+# esc_bound:escalation threshold as per BOIN
+# des_bound: de-escalation threshold as per BOIN
+# target: target DLT rate
+# beta_a_safety: shape parameter for prior as per safety stopping rule 
+# beta_b_safety: rate parameter for prior as per safety stopping rule 
 
 #pro_ls: list containing all parameters associated with PRO-nAE burden score
-    # pro.schedule: Every number of weeks PRO-nAE data is collected (two weeks in this paper)
-    # beta_shape_sc: marix of shape parameters for the doses at each timepoint for PRO-nAE data synthesis
-    # beta_rate_sc: fixed numerical rate parameter for PRO-nAE data synthesis 
-    # pro.between.cohort.timepoints: the number of weeks between cohort recruitment (week 4 in this paper)
+# pro.schedule: Every number of weeks PRO-nAE data is collected (two weeks in this paper)
+# beta_shape_sc: marix of shape parameters for the doses at each timepoint for PRO-nAE data synthesis
+# beta_rate_sc: fixed numerical rate parameter for PRO-nAE data synthesis 
+# pro.between.cohort.timepoints: the number of weeks between cohort recruitment (week 4 in this paper)
 
 #eff_ls: list containing all parameters associated with efficacy 
 # eff.schedule:  vector of time (weeks) of efficacy assessments 
@@ -529,19 +532,18 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
 #data_after_dlt: TRUE/FALSE indicating if PRO/efficacy data is collected/available beyond a DLT observation
 
 #Output: list; containing:
-  #final.rec: vector of final recommendation 
-  #boin.admiss: vector of final set of admissible doses
-  #dose.explored: vector of doses explored within trial
-  #pat.allocated: vector of number of patients allocated to each dose
-  #cdlt: matrix of patients with DLT observations
-  #eff: matrix of patients with efficacy observations 
-  #pro: matrix of patients with pro observations
-  #loss_est: vector of expected loss for each dose
-  #eff_est: vector of expected efficacy for each dose
-  #pro_est: vector of expected PRO-nAE score for each dose
-  #n_cens: vector of number of patients experiencing non-treatment related death for each dose
-  #n_dlt: vector of number of dlts at each dose  
-
+#final.rec: vector of final recommendation 
+#boin.admiss: vector of final set of admissible doses
+#dose.explored: vector of doses explored within trial
+#pat.allocated: vector of number of patients allocated to each dose
+#cdlt: matrix of patients with DLT observations
+#eff: matrix of patients with efficacy observations 
+#pro: matrix of patients with pro observations
+#loss_est: vector of expected loss for each dose
+#eff_est: vector of expected efficacy for each dose
+#pro_est: vector of expected PRO-nAE score for each dose
+#n_cens: vector of number of patients experiencing non-treatment related death for each dose
+#n_dlt: vector of number of dlts at each dose  
  
 trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   #general inputs
@@ -550,14 +552,16 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   between.cohort.wk<-general_ls[[3]]
   n.doses<-general_ls[[4]]
   n.timepoints<-general_ls[[5]]
-  final.assessment.timepoint<-general_ls[[6]]
-  mcmc.niter<-general_ls[[7]]
-  mcmc.burnin.prop<- general_ls[[8]]
-  n.cohorts.all<- general_ls[[9]]
-  cop.corr<- general_ls[[10]]
+  n.toxicity<- general_ls[[6]]
+  n.grades<- general_ls[[7]]
+  final.assessment.timepoint<-general_ls[[8]]
+  mcmc.niter<-general_ls[[9]]
+  mcmc.burnin.prop<- general_ls[[10]]
+  n.cohorts.all<- general_ls[[11]]
+  n.sim.final<- general_ls[[12]]
+  cop.corr<- general_ls[[13]]
   n.sim.final<- mcmc.niter*(1-mcmc.burnin.prop)
-  
-  #dlt inputs 
+  #dlt inputs
   cdlt_rates<- boin_ls[[1]]
   esc_bound<- boin_ls[[2]]
   des_bound<- boin_ls[[3]]
@@ -570,6 +574,7 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   beta_shape_sc<- pro_ls[[2]]
   beta_rate_sc<- pro_ls[[3]]
   pro.between.cohort.timepoints<-pro_ls[[4]]
+  max.pro<- pro_ls[[5]]
   
   #eff inputs
   eff.schedule<- eff_ls[[1]]
@@ -589,14 +594,14 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   
   
   #compute time of random non-treatment related death
-  median_survival_month<- (general_ls[[11]]-1)
+  median_survival_month<- (general_ls[[14]]-1)
   lambda<- log(2)/(median_survival_month*4)
   pat_cens<-rexp(n.patient.cohort*n.cohorts.all, lambda)+first.week.assessed
   wk_interim1<- eff.schedule[2]+(interim_complete_cohort1-1)*between.cohort.wk
   wk_interim2<- eff.schedule[2]+(interim_complete_cohort2-1)*between.cohort.wk
-  cohort_allot_interim1<-(wk_interim1/between.cohort.wk)+1 
-  cohort_allot_interim2<-(wk_interim2/between.cohort.wk)+1 
-  clin_set<-boin(cdlt_rates, n.patient.cohort, first.week.assessed, 
+  cohort_allot_interim1<-(wk_interim1/between.cohort.wk)+1
+  cohort_allot_interim2<-(wk_interim2/between.cohort.wk)+1
+  clin_set<-boin(cdlt_rates, n.patient.cohort, first.week.assessed,
                  between.cohort.wk, n.doses, esc_bound, des_bound, target, copula, beta_a_safety, beta_b_safety, cohort_allot_interim1)
   clin_mat<- clin_set[[1]]
   initial_rec<- clin_set[[2]]
@@ -605,26 +610,26 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
     return(list(final.rec=NA, boin.admiss=NA, dose.explored=NA, pat.allocated=NA,
                 cdlt = NA, eff=NA, pro=NA))
   }
-  #make next dose decision using BOIN data  
+  #make next dose decision using BOIN data
   eff_admiss<- 1:n.doses
   next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
-  next.dose<-next.recommendation[[1]] 
+  next.dose<-next.recommendation[[1]]
   boin.admiss<-next.recommendation[[2]]
   while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
     #update tables for next dose recommendation
     clin_mat<-boin_next(clin_mat, n.patient.cohort, between.cohort.wk, cdlt_rates,next.dose, copula)
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
-    next.dose<-next.recommendation[[1]] 
+    next.dose<-next.recommendation[[1]]
     if(next.dose[length(next.dose)]==0){
       return(NA)
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
-      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], between.cohort.wk, eff.schedule, general_ls[[11]]-1)
+      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], between.cohort.wk, eff.schedule, general_ls[[14]]-1)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
           if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
-            eff[k, 5]<-eff[k,3] 
+            eff[k, 5]<-eff[k,3]
             eff[k, 4]<-0
           }else{
             eff[k, 5]<-0
@@ -644,14 +649,14 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       eff<- rbind(eff, eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                               between.cohort.wk, eff.schedule, general_ls[[11]]-1))
+                               between.cohort.wk, eff.schedule, general_ls[[14]]-1))
       eff[,1]<- 1:(interim_complete_cohort2*n.patient.cohort)
       week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2)]
       for(k in (n.patient.cohort*interim_complete_cohort1+1):max(eff[,1])){
         i<- k-n.patient.cohort*interim_complete_cohort1
         if(week_trunc[i]<eff.schedule[2]){
           if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-            eff[k, 5]<-eff[k,3] 
+            eff[k, 5]<-eff[k,3]
             eff[k, 4]<-0
           }else{
             eff[k, 5]<-0
@@ -671,27 +676,27 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
     }
     boin.admiss<-intersect(next.recommendation[[2]], eff_admiss)
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
-    next.dose<-next.recommendation[[1]] 
+    next.dose<-next.recommendation[[1]]
     if(next.dose[length(next.dose)]==0){
       return(NA)
     }
     print(next.dose)
   }
-  #stage 2 - evaluate right at the end of the trial 
+  #stage 2 - evaluate right at the end of the trial
   c_dose<- clin_mat[(1:n.cohorts.all)*n.patient.cohort,2]
   #create pro matrix
-  pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
+  pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose,
                beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
   
   eff<- rbind(eff, eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
-                           between.cohort.wk, eff.schedule, general_ls[[11]]-1))
+                           between.cohort.wk, eff.schedule, general_ls[[14]]-1))
   eff[,1]<- 1:(n.cohorts.all*n.patient.cohort)
   week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort2+1):(n.patient.cohort*n.cohorts.all)]
   for(k in (n.patient.cohort*interim_complete_cohort2+1):max(eff[,1])){
     i<- k-n.patient.cohort*interim_complete_cohort2
     if(week_trunc[i]<eff.schedule[2]){
       if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-        eff[k, 5]<-eff[k,3] 
+        eff[k, 5]<-eff[k,3]
         eff[k, 4]<-0
       }else{
         eff[k, 5]<-0
@@ -716,9 +721,11 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
     }
   }
   #find final recommendation
-  final.run<- final.recommendation.all(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
-                                       beta_a, beta_b, target, clin_mat[,2], clin_mat[,4], n.sim.final)
-  final<- final.run[[1]]
+  
+  loss.est.pipe<-loss.all(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
+                          0.5, 0.5, n.sim.final)
+  loss.est.bb<-loss.all.bb(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
+                           0.5, 0.5, n.sim.final)
   final.admiss<-intersect(boin_admiss(target,clin_mat[,2],clin_mat[,4], beta_a, beta_b), futility_decision(min_eff,eff[,2],eff[,5], beta_a, beta_b, n.doses))
   explored<- unique(clin_mat[,2])
   allocated<- sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
@@ -726,11 +733,9 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   ncens<-sapply(1:n.doses, function (k) sum(cens_val[cens_val[,2]==k,1]))[explored]
   dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
   ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
-
-  # return(list(final.rec=final, boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated, pro.est=pro.estimate, 
-  #             eff.est=efficacy.estimate, loss=loss.val, cdlt = clin_mat, eff=cdlt_eff_mat, pro=cdlt_pro_mat))
-  return(list(final.rec=final, 
+  
+  return(list(#final.rec=final,
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
-    cdlt = clin_mat,eff=eff, pro=pro, loss_est=final.run[[2]][explored], eff_est=final.run[[4]][explored], pro_est=final.run[[3]][explored], 
-    n_cens=ncens,n_dlt= ndlt))
+    cdlt = clin_mat,eff=eff, pro=pro, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored],
+    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored]))
 }
