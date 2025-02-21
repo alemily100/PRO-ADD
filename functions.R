@@ -26,8 +26,6 @@ library(mvtnorm)
 #cohort_allot_interim1: cohort for first evaluation of futility stopping rule 
 
 #Output:list; matrix detailing DLT observations for each patient and vector of dose recommendations  
-
-
 boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc_bound, de_esc_bound, target, copula, alpha, beta, cohort_allot_interim1){
   i<-current_dose<- 1
   inadmiss<-c()
@@ -112,7 +110,6 @@ boin_decision<- function(target, dose, cdlt, esc_bound, n.dose, alpha, beta){
   }
   return(admiss)
 }
-
 ###############################################
 
 #Description: Futility stopping rule decision 
@@ -194,28 +191,6 @@ pro_sim<- function(n.cohort, n.cohorts.assess, n.timepoints, pro.schedule, c_dos
 ################ 
 
 #Description: RJAGS model to use to estimate PRO-nAE burden score 
-
-model<- "model{
-#Likelihood for Y
-for (i in 1:length(Y)){
-Y[i]~dbeta(alpha[i], beta[i])
-alpha[i]<-m[i]*phi
-beta[i]<- (1-m[i])*phi
-logit(m[i])<-  (b0 + u[subj[i],1]) + b1*X[i]+ b2*Z[i] + b3*Z[i]^2
-}
-#Define random effect on each subject
-for (j in n_patients){
-    u[j,1] ~ dmnorm(0, sy)
-  }
-#Prior models
-b1~dnorm(0, 1/100)
-b2 ~ dnorm(0, 1/100)
-b3~dnorm(0, 1/100)
-b0 ~ dnorm(0,1/100)
-#The variance  sigma^2_gamma is inverse gamma, and so the precision should be gamma
-sy~dgamma(0.1,0.1)
-phi~dgamma(0.1,0.1)
-}"
 
 model_all<- "model{
 #Likelihood for Y
@@ -363,10 +338,9 @@ pipe_est<- function(eff_data,e, a, b, n_t_grid){
   return(prob)
 }
 
-
 ##########################
 
-#Description: Samples from the posterior estimates of probability of efficacy as per iPipe design
+#Description: Samples from the posterior estimates of probability of efficacy as per iPipe 
 
 #Input:
 #eff_outcome: vector of patients responses for all patients at specified dose
@@ -374,6 +348,7 @@ pipe_est<- function(eff_data,e, a, b, n_t_grid){
 #beta: rate parameter for beta prior
 #n.sim.final: number of samples to collect from the posterior distribution
 
+#Output:matrix; estimated efficacy for each dose sampled from the posterior
 
 eff_estimate_sim<- function(eff_outcome, alpha, beta, n.sim.final){
   ep<- runif(n.sim.final)
@@ -381,9 +356,31 @@ eff_estimate_sim<- function(eff_outcome, alpha, beta, n.sim.final){
   return(t(val))
 }
 
+##########################
+
+#Description: Samples from the posterior estimates of probability of efficacy as per beta binomial model 
+
+#Input:
+#eff_data: vector of patients responses for all patients at specified dose
+#alpha: shape parameter for beta prior
+#beta: rate parameter for beta prior
+#n.sim.final: number of samples to collect from the posterior distribution
+
+#Output: list; [[1]] a matrix of each dose sampled from the posterior 
+#and [[2]] the mean posterior estimates for each dose
+beta_binom_eff<- function(eff_data, alpha, beta, n.sim.final){
+  ext<-sapply(1:5, function (k) na.omit(eff_data[eff_data[,2]==k,5]))
+  sum <- sapply(ext, sum)
+  n <- sapply(ext, length)
+  alpha_new<-sapply(1:5, function (k) sum[k]+alpha)
+  beta_new<- sapply(1:5, function (k) n[k] - sum[k]+ beta)
+  beta.sim<-sapply(1:5, function (k) rbeta(n.sim.final, alpha_new[k], beta_new[k]))
+  mean.eff<-sapply(1:5, function (k) alpha_new[k]/(alpha_new[k]+beta_new[k]))
+  return(list(beta.sim,mean.eff))
+}
 ###################
 
-#Description: calculate the expected loss for each dose using both efficacy and PRO-nAE burden score 
+#Description: calculate the expected loss for each dose using both efficacy (iPipe) and PRO-nAE burden score 
 
 #Inputs:
 #pro_data: matrix of PRO-nAE data as per `pro_sim` function 
@@ -403,6 +400,36 @@ loss.all<- function(pro_data, assessment.time.point, n.iter, runin.prop, n.dose,
   pro_sample<- sapply(1:n.dose, function(k) rbeta(n.sim.final,pro[[1]][k]*pro[[2]],(1-pro[[1]][k])*pro[[2]]))
   eff<-eff_estimate_sim(eff_data, alpha, beta, n.sim.final)
   eff.est<-colMeans(eff)
+  loss.val<- matrix(nrow=n.sim.final, ncol=n.dose)
+  for(i in 1:n.sim.final){
+    loss.val[i,]<- ((pro_sample[i,]^2) + (eff[i,]-1)^2)^(1/2)
+  }
+  return(list(colMeans(loss.val), pro[[1]], eff.est))
+}
+
+###################
+
+#Description: calculate the expected loss for each dose using both efficacy (Beta-binomial) and PRO-nAE burden score 
+
+#Inputs:
+#pro_data: matrix of PRO-nAE data as per `pro_sim` function 
+#assessment.time.point: time point at which to estimate PRO-nAE burden score 
+#n.iter: Number of iterations of rjags to run 
+#runin.prop: Proportion of n.iter to be runin
+#n.dose: number of doses
+#eff_data: vector of patients responses for all patients at specified dose
+#a: shape parameter for beta prior in iPipe
+#b: rate parameter for beta prior in iPipe
+#n.sim.final: number of samples to collect from the posterior distribution
+
+#Output: list; estimated loss, PRO-nAE score and probability of response for each dose
+
+loss.all.bb<- function(pro_data, assessment.time.point, n.iter, runin.prop, n.dose, eff_data, alpha, beta, n.sim.final){
+  pro<- pro_estimate.all(pro_data, assessment.time.point, n.iter, runin.prop, n.dose)
+  pro_sample<- sapply(1:n.dose, function(k) rbeta(n.sim.final,pro[[1]][k]*pro[[2]],(1-pro[[1]][k])*pro[[2]]))
+  efficacy<- beta_binom_eff(eff_data, alpha, beta, n.sim.final)
+  eff<-efficacy[[1]]
+  eff.est<-efficacy[[2]]
   loss.val<- matrix(nrow=n.sim.final, ncol=n.dose)
   for(i in 1:n.sim.final){
     loss.val[i,]<- ((pro_sample[i,]^2) + (eff[i,]-1)^2)^(1/2)
@@ -436,34 +463,6 @@ recommendation<- function(n.dose, target, dose, cdlt, esc_bound, alpha, beta, ef
     ifelse(length(admiss)==1, rec<- admiss, rec<- sample(admiss, size=1, prob=(1/n.admiss)[admiss]))
     return(list(rec,admiss))
   }
-}
-
-################
-
-#Description: calculate the final recommended dose using the expected loss for each dose using both efficacy and PRO-nAE burden score 
-
-#Inputs:
-#pro_data: matrix of PRO-nAE data as per `pro_sim` function 
-#assessment.time.point: time point at which to estimate PRO-nAE burden score 
-#n.iter: Number of iterations of rjags to run 
-#runin.prop: Proportion of n.iter to be runin
-#n.dose: number of doses
-#eff_data: vector of patients responses for all patients at specified dose
-#alpha: shape parameter for beta prior in iPipe
-#beta: rate parameter for beta prior in iPipe
-#target: target DLT rate
-#dose: vector of dose recommendations for each patient
-#cdlt: vector of cdlt observations for each patient 
-#n.sim.final: number of samples to collect from the posterior distribution
-
-#Output: list; recommended dose, estimated loss, PRO-nAE score and probability of response for each dose
-
-
-final.recommendation.all<- function(pro_data, assessment.time.point, n.iter, runin.prop, n.dose, eff_data, alpha, beta, target, dose, cdlt,n.sim.final){
-  loss.est<-loss.all(pro_data, assessment.time.point, n.iter, runin.prop, n.dose, eff_data, alpha, beta, n.sim.final)
-  admiss<- boin_admiss(target, dose, cdlt, alpha, beta)
-  rec<- which(loss.est[[1]]==min(loss.est[[1]][admiss]))
-  return(list(rec, loss.est[[1]], loss.est[[2]], loss.est[[3]]))
 }
 
 ##################
