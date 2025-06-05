@@ -12,3 +12,5 @@ This project evaluates the operating characteristics of the novel PRO-ADD design
 * **shape_param_inc.csv** - code for Section 4: .csv file containing matrix of shape parameters to define PRO-nAE burden score simualation scenarios.
 
 * **rate_param_inc.csv** - code for Section 4: .csv file containing rate parameter to define PRO-nAE burden score simualation scenarios.
+
+* **fig3_data.csv** - 1,000 posterior samples of probability of response and PRO-nAE burden score for each dose used to create Figure 3 in the main manuscript. 
