@@ -620,9 +620,11 @@ trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, da
   pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
                beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
   
-  eff<- rbind(eff, eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
-                           between.cohort.wk, eff.schedule, general_ls[[14]]-1))
-  eff[,1]<- 1:(n.cohorts.all*n.patient.cohort)
+  new<- eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
+                           between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+  relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
+  eff<- rbind(eff,new)
+  eff[,1]<- relabel
   week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort2+1):(n.patient.cohort*n.cohorts.all)]
   for(k in (n.patient.cohort*interim_complete_cohort2+1):max(eff[,1])){
     i<- k-n.patient.cohort*interim_complete_cohort2
