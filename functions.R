@@ -761,12 +761,12 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
           if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
-            eff[k, 5]<-eff[k,3] 
-            eff[k, 4]<-0
+            eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
+            eff[which(eff[,1]==k), 4]<-0
           }else{
-            eff[k, 5]<-0
-            eff[k, 4]<-0
-            eff[k, 3]<-0
+            eff[which(eff[,1]==k), 5]<-0
+            eff[which(eff[,1]==k), 4]<-0
+            eff[which(eff[,1]==k), 3]<-0
           }
         }
       }
@@ -791,12 +791,12 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
         i<- k-n.patient.cohort*interim_complete_cohort1
         if(week_trunc[i]<eff.schedule[2]){
           if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-            eff[k, 5]<-eff[k,3] 
-            eff[k, 4]<-0
+            eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
+            eff[which(eff[,1]==k), 4]<-0
           }else{
-            eff[k, 5]<-0
-            eff[k, 4]<-0
-            eff[k, 3]<-0
+            eff[which(eff[,1]==k), 5]<-0
+            eff[which(eff[,1]==k), 4]<-0
+            eff[which(eff[,1]==k), 3]<-0
           }
         }
       }
@@ -832,12 +832,12 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     i<- k-n.patient.cohort*interim_complete_cohort2
     if(week_trunc[i]<eff.schedule[2]){
       if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-        eff[k, 5]<-eff[k,3] 
-        eff[k, 4]<-0
+        eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
+        eff[which(eff[,1]==k), 4]<-0
       }else{
-        eff[k, 5]<-0
-        eff[k, 4]<-0
-        eff[k, 3]<-0
+        eff[which(eff[,1]==k), 5]<-0
+        eff[which(eff[,1]==k), 4]<-0
+        eff[which(eff[,1]==k), 3]<-0
       }
     }
   }
