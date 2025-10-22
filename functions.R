@@ -474,6 +474,7 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
 
 
 #TRIAL DESIGN 
+#note - treatment policy marks patient after DLT as a non-responder 
 trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
@@ -577,9 +578,11 @@ trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, da
       eff_admiss<-futility_decision(min_eff, eff[,2], eff[,5], beta_a, beta_b, n.doses)
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
-      eff<- rbind(eff, eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                               between.cohort.wk, eff.schedule, general_ls[[14]]-1))
-      eff[,1]<- 1:(interim_complete_cohort2*n.patient.cohort)
+      new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
+                    between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+      relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
+      eff<- rbind(eff,new)
+      eff[,1]<- relabel
       week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2)]
       for(k in (n.patient.cohort*interim_complete_cohort1+1):max(eff[,1])){
         i<- k-n.patient.cohort*interim_complete_cohort1
@@ -786,12 +789,12 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_a
         i<- k-n.patient.cohort*interim_complete_cohort1
         if(week_trunc[i]<eff.schedule[2]){
           if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-            eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
-            eff[which(eff[,1]==k), 4]<-0
+            eff[k, 5]<-eff[k,3] 
+            eff[k, 4]<-0
           }else{
-            eff[which(eff[,1]==k), 5]<-0
-            eff[which(eff[,1]==k), 4]<-0
-            eff[which(eff[,1]==k), 3]<-0
+            eff[k, 5]<-0
+            eff[k, 4]<-0
+            eff[k, 3]<-0
           }
         }
       }
