@@ -474,7 +474,7 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
 
 
 #TRIAL DESIGN 
-trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
+trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
   first.week.assessed<- general_ls[[2]]
@@ -672,7 +672,7 @@ trial_design<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
 
 
 #TRIAL DESIGN 
-trial_design_patrm<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
+trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
   first.week.assessed<- general_ls[[2]]
