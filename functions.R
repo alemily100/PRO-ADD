@@ -161,6 +161,7 @@ beta_matrix<- function(n.toxicity, shape_dose_vec, rate_cycle_vec, baseline_a, b
 
 ######## BOIN functions 
 boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc_bound, de_esc_bound, target, copula, alpha, beta, cohort_allot_interim1){
+
   i<-current_dose<- 1
   inadmiss<-c()
   acc.dose<- 1:n.dose
@@ -169,9 +170,10 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
   M<- matrix(nrow=n.cohort, ncol=5)
   colnames(M)<-c("subj", "dose", "week", "c-dlt", "week_timeline")
   M[,1]<- 1:n.cohort
+  dlt_uniform<-pnorm(copula[1:n.cohort,1])
   M[,2]<- rep(current_dose, times=n.cohort)
   M[,3]<- rep(week.assessed, times=n.cohort)
-  M[,4]<- sapply(1:n.cohort, function (k) qbinom(copula[1,k], 1, cdlt.rate[current_dose]))
+  M[,4]<- findInterval(dlt_uniform, cdlt.rate[current_dose], rightmost.closed = TRUE, all.inside = TRUE)
   M[,5]<- rep(week.assessed, times=n.cohort)
   week<- week.assessed+between.cohort.wk
   stop<- 0
@@ -200,7 +202,8 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
     i<- i+1
     dosage[i]<- current_dose
     new.subj<- ((week/between.cohort.wk-1)*n.cohort+1):((week/between.cohort.wk-1)*n.cohort+n.cohort)
-    new.c.dlt<- sapply(new.subj, function (k) qbinom(copula[1,k], 1, cdlt.rate[current_dose]))
+    dlt_uniform<-pnorm(copula[new.subj,1])
+    new.c.dlt<- findInterval(dlt_uniform, cdlt.rate[current_dose], rightmost.closed = TRUE, all.inside = TRUE)
     M<-rbind(M, matrix(c(new.subj, rep(current_dose, times=n.cohort), rep(week.assessed, times=n.cohort), new.c.dlt, rep(week, times=n.cohort)), ncol=5))
     week<- week+between.cohort.wk
     stop_test<- sum(M[M[,2]==current_dose,4])/sum(M[,2]==current_dose)
@@ -237,7 +240,8 @@ futility_decision<- function(min_target, dose, eff, alpha, beta, n.dose){
 
 boin_next<- function(clin_data, n.pat.cohort, between.cohort.wk, cdlt.rate, rec_dose, copula){
   new.subj<-(max(clin_data[,1])+1):(max(clin_data[,1])+n.pat.cohort)
-  rate<- sapply(new.subj, function (k) qbinom(copula[1,k], 1, cdlt.rate[rec_dose]))
+  dlt_uniform<-pnorm(copula[new.subj,1])
+  rate<- findInterval(dlt_uniform, cdlt.rate[rec_dose], rightmost.closed = TRUE, all.inside = TRUE)
   mat<-matrix(c(new.subj, rep(rec_dose, times=n.pat.cohort), rep(between.cohort.wk, times=n.pat.cohort),
                 rate, rep(max(clin_data[,5])+between.cohort.wk, times=n.pat.cohort)), ncol=5)
   return(rbind(clin_data, mat))
@@ -255,7 +259,7 @@ pro_sim<- function(n.cohort, n.cohorts.assess, n.timepoints, pro.schedule, c_dos
     dose<- c(rep(0, times=n.cohort), rep(currentd, times =n.cohort*(n.timepoints)))
     week<- rep(0:n.timepoints, each=n.cohort)
     cop_dim<- rep(2:9, times=3)
-    score<-sapply(1:(length(subj)-n.cohort), function (k) qbeta(copula[cop_dim[k],subj[k]], shape1=shape_mat[currentd,week[-(1:n.cohort)][k]+1], shape2=rate))
+    score<-sapply(1:(length(subj)-n.cohort), function (k) qbeta(copula[subj[k], cop_dim[k]], shape1=shape_mat[currentd,week[-(1:n.cohort)][k]+1], shape2=rate))
     score<- c(rbeta(n.cohort, shape_mat[1,1], rate),score)
     week_time <- (week*2)+between.cohort.wk*(cohort-1)
     M<-rbind(M, cbind(subj, dose, rep((0:n.timepoints)*pro.schedule, each=n.cohort), score, week_time)) 
@@ -314,20 +318,21 @@ f1 <- function(x,t1, t2, prob) {
   (1-prob)-(t1 + x*(1-t1))*(t2+x*(1-t2))
 }
 
-eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.cohort.wk, eff.schedule, med_survival_month){
-  prob_efficacy_sim<-sapply(1:5, function (k) 1-uniroot(f1, t1=pexp(eff.schedule[1], rate=(log(2)/(med_survival_month*4))), 
-                                                        t2= pexp(eff.schedule[2], rate=(log(2)/(med_survival_month*4))), prob=prob_efficacy[k], c(0,1))$root)
-  
+eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.cohort.wk, eff.schedule, med_survival_month, copula, n.timepoints){
+  prob_efficacy_sim<-sapply(1:5, function (k) sqrt(1-prob_efficacy[k]))
   M<- matrix(nrow=n.cohort*n.cohorts.assess, ncol=6)
   colnames(M)<-c("subj", "dose", "eff1", "eff2", "best.eff", "week_timeline")
+  r1_uniform<-pnorm(copula[,n.timepoints+2])
+  r2_uniform<-pnorm(copula[,n.timepoints+3])
   M[,1]<- 1:(n.cohort*n.cohorts.assess)
   M[,2]<- rep(c_dose, each=n.cohort)
-  M[,3]<- sapply(1:n.cohorts.assess, function (k) rbinom(n.cohort, 1, prob_efficacy_sim[c_dose[k]]))
-  M[,4]<- sapply(1:n.cohorts.assess, function (k) rbinom(n.cohort, 1, prob_efficacy_sim[c_dose[k]]))
+  M[,3]<- sapply(1:n.cohorts.assess, function (k) findInterval(r1_uniform, prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
+  M[,4]<- sapply(1:n.cohorts.assess, function (k) findInterval(r2_uniform, prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
   M[,5]<- pmax(M[,3],M[,4])
   M[,6]<- eff.schedule[2]+between.cohort.wk*(0:(n.cohorts.assess-1))
   return(M)
 }  
+
 
 pipe_est<- function(eff_data,e, a, b, n_t_grid){
   ext<-sapply(1:5, function (k) na.omit(eff_data[eff_data[,2]==k,5]))
@@ -693,6 +698,8 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   n.sim.final<- general_ls[[12]]
   cop.corr<- general_ls[[13]]
   n.sim.final<- mcmc.niter*(1-mcmc.burnin.prop)
+  correlation_dlt_response<-general_ls[[14]]
+  correlation_r1_r2<- general_ls[[15]]
   #dlt inputs 
   cdlt_rates<- boin_ls[[1]]
   esc_bound<- boin_ls[[2]]
@@ -717,13 +724,15 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   interim_complete_cohort1<- eff_ls[[6]]
   interim_complete_cohort2<- eff_ls[[7]]
   
-  ###stage 1 - create data up until cohort 6
-  mat<-diag(2, nrow=n.timepoints+1, ncol=n.timepoints+1)
-  mat<-matrix(rep(0.9, times=(n.timepoints+1)^2), nrow=n.timepoints+1)
-  diag(mat)<- 1
-  t<-rmvnorm(n=n.cohorts.all*n.patient.cohort,mean = rep(0, times=n.timepoints+1), sigma = mat)
-  copula<-sapply(1:(n.cohorts.all*n.patient.cohort), function (k) pnorm(t[k,], mean = rep(0), sd = sqrt(1)))
   
+  ###stage 1 - create data up until cohort 6
+  mat<-diag(2, nrow=n.timepoints+3, ncol=n.timepoints+3)
+  mat<-matrix(rep(0.7, times=(n.timepoints+3)^2), nrow=n.timepoints+3)
+  mat[,n.timepoints+2]<- c(correlation_dlt_response,rep(0, times=n.timepoints), 1,correlation_r1_r2)
+  mat[,n.timepoints+3]<- c(correlation_dlt_response,rep(0, times=n.timepoints), correlation_r1_r2, 1)
+  mat[n.timepoints+2,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), 1, correlation_r1_r2)
+  mat[n.timepoints+3,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), correlation_r1_r2, 1)
+  copula<-rmvnorm(n=n.cohorts.all*n.patient.cohort,mean = rep(0, times=n.timepoints+3), sigma = mat)
   
   #compute time of random non-treatment related death
   median_survival_month<- (general_ls[[14]]-1)
@@ -756,7 +765,8 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       return(NA)
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
-      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
+                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[1:(n.cohort*n.cohorts.assess),],n.timepoints)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
@@ -782,7 +792,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(nrow(eff)+1):(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)),], n.timepoints)
       relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
       eff<- rbind(eff,new)
       eff[,1]<- relabel
@@ -823,7 +833,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
                beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
   new<- eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
-                between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+                between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(nrow(eff)+1):(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)),], n.timepoints)
   relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
   eff<- rbind(eff,new)
   eff[,1]<- relabel
