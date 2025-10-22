@@ -74,7 +74,7 @@ invisible(clusterEvalQ(cl,{
   source("functions.R")
 }))
 clusterExport(cl, c("general_list", "boin_list", "pro_list", "eff_list", "n.sim", "data.after.dlt"))
-val<-parLapply(cl, 1:n.sim, function (k) trial_design(general_list, boin_list, pro_list, eff_list, data.after.dlt))
+val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical(general_list, boin_list, pro_list, eff_list, data.after.dlt))
 stopCluster(cl)
 
 final.sim<-sum(sapply(1:n.sim, function (k) sum(is.na(val[[k]][[1]]))==FALSE))
