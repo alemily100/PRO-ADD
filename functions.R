@@ -475,7 +475,7 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
 
 #TRIAL DESIGN 
 #note - treatment policy marks patient after DLT as a non-responder 
-trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
+trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
   first.week.assessed<- general_ls[[2]]
