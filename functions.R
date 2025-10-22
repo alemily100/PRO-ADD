@@ -233,7 +233,7 @@ boin_decision<- function(target, dose, cdlt, esc_bound, n.dose, alpha, beta){
 }
 
 futility_decision<- function(min_target, dose, eff, alpha, beta, n.dose){
-  not.admiss<-sapply(1:n.dose, function (k) (pbeta(min_target,alpha+sum(eff[which(dose==k)]),length(which(dose==k))-sum(eff[which(dose==k)])+ beta)>0.7)&(sum(dose==k)>=6))
+  not.admiss<-sapply(1:n.dose, function (k) (pbeta(min_target,alpha+sum(eff[which(dose==k)], na.rm=TRUE),sum(dose[!is.na(eff)] == k)-sum(eff[which(dose==k)], na.rm=TRUE)+ beta)>0.7)&(sum(dose[!is.na(eff)] == k)>=6))
   admiss<- (1:n.dose)[!not.admiss]
   return(admiss)
 }
@@ -773,11 +773,11 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
         if(week_trunc[k]<eff.schedule[2]){
           if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
             eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
-            eff[which(eff[,1]==k), 4]<-0
+            eff[which(eff[,1]==k), 4]<-NA
           }else{
-            eff[which(eff[,1]==k), 5]<-0
-            eff[which(eff[,1]==k), 4]<-0
-            eff[which(eff[,1]==k), 3]<-0
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+            eff[which(eff[,1]==k), 3]<-NA
           }
         }
       }
@@ -803,11 +803,11 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
         if(week_trunc[i]<eff.schedule[2]){
           if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
             eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
-            eff[which(eff[,1]==k), 4]<-0
+            eff[which(eff[,1]==k), 4]<-NA
           }else{
-            eff[which(eff[,1]==k), 5]<-0
-            eff[which(eff[,1]==k), 4]<-0
-            eff[which(eff[,1]==k), 3]<-0
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+            eff[which(eff[,1]==k), 3]<-NA
           }
         }
       }
@@ -844,11 +844,11 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     if(week_trunc[i]<eff.schedule[2]){
       if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
         eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
-        eff[which(eff[,1]==k), 4]<-0
+        eff[which(eff[,1]==k), 4]<-NA
       }else{
-        eff[which(eff[,1]==k), 5]<-0
-        eff[which(eff[,1]==k), 4]<-0
-        eff[which(eff[,1]==k), 3]<-0
+        eff[which(eff[,1]==k), 5]<-NA
+        eff[which(eff[,1]==k), 4]<-NA
+        eff[which(eff[,1]==k), 3]<-NA
       }
     }
   }
