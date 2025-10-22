@@ -59,7 +59,7 @@ pro_list<- list(pro.schedule=2,beta_shape_sc=pro.scen[[scenario]], beta_rate_sc=
 
 eff_list<- list(eff.schedule=c(8,16), eff_rates=eff.scen[[scenario]], beta_a=0.1, beta_b=0.9, min_eff=0.1, interim_complete_cohort1=6,
                 interim_complete_cohort2=12)
-data.after.dlt<- FALSE
+
 n.sim<-5000
 cl <- makeCluster(detectCores())
 clusterSetRNGStream(cl,1915)
@@ -73,8 +73,8 @@ invisible(clusterEvalQ(cl,{
   #setwd("M:/PhD/Trial Designs/mayo_clinic")
   source("functions.R")
 }))
-clusterExport(cl, c("general_list", "boin_list", "pro_list", "eff_list", "n.sim", "data.after.dlt"))
-val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical(general_list, boin_list, pro_list, eff_list, data.after.dlt))
+clusterExport(cl, c("general_list", "boin_list", "pro_list", "eff_list", "n.sim"))
+val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical(general_list, boin_list, pro_list, eff_list))
 stopCluster(cl)
 
 final.sim<-sum(sapply(1:n.sim, function (k) sum(is.na(val[[k]][[1]]))==FALSE))
