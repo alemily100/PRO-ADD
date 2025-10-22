@@ -258,8 +258,8 @@ pro_sim<- function(n.cohort, n.cohorts.assess, n.timepoints, pro.schedule, c_dos
     currentd<- c_dose[cohort]
     dose<- c(rep(0, times=n.cohort), rep(currentd, times =n.cohort*(n.timepoints)))
     week<- rep(0:n.timepoints, each=n.cohort)
-    cop_dim<- rep(2:9, times=3)
-    score<-sapply(1:(length(subj)-n.cohort), function (k) qbeta(copula[subj[k], cop_dim[k]], shape1=shape_mat[currentd,week[-(1:n.cohort)][k]+1], shape2=rate))
+    cop_dim<- rep(2:9, times=n.cohort)
+    score<-sapply(1:(length(subj)-n.cohort), function (k) qbeta(pnorm(copula[subj[k], cop_dim[k]]), shape1=shape_mat[currentd,week[-(1:n.cohort)][k]+1], shape2=rate))
     score<- c(rbeta(n.cohort, shape_mat[1,1], rate),score)
     week_time <- (week*2)+between.cohort.wk*(cohort-1)
     M<-rbind(M, cbind(subj, dose, rep((0:n.timepoints)*pro.schedule, each=n.cohort), score, week_time)) 
@@ -326,8 +326,8 @@ eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.coh
   r2_uniform<-pnorm(copula[,n.timepoints+3])
   M[,1]<- 1:(n.cohort*n.cohorts.assess)
   M[,2]<- rep(c_dose, each=n.cohort)
-  M[,3]<- sapply(1:n.cohorts.assess, function (k) findInterval(r1_uniform, prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
-  M[,4]<- sapply(1:n.cohorts.assess, function (k) findInterval(r2_uniform, prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
+  M[,3]<- sapply(1:n.cohorts.assess, function (k) findInterval(r1_uniform[(n.cohort*(k-1)+1):(n.cohort*k)], prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
+  M[,4]<- sapply(1:n.cohorts.assess, function (k) findInterval(r2_uniform[(n.cohort*(k-1)+1):(n.cohort*k)], prob_efficacy_sim[c_dose[k]], rightmost.closed = TRUE, all.inside = TRUE))
   M[,5]<- pmax(M[,3],M[,4])
   M[,6]<- eff.schedule[2]+between.cohort.wk*(0:(n.cohorts.assess-1))
   return(M)
@@ -698,8 +698,8 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   n.sim.final<- general_ls[[12]]
   cop.corr<- general_ls[[13]]
   n.sim.final<- mcmc.niter*(1-mcmc.burnin.prop)
-  correlation_dlt_response<-general_ls[[14]]
-  correlation_r1_r2<- general_ls[[15]]
+  correlation_dlt_response<-general_ls[[15]]
+  correlation_r1_r2<- general_ls[[16]]
   #dlt inputs 
   cdlt_rates<- boin_ls[[1]]
   esc_bound<- boin_ls[[2]]
@@ -732,6 +732,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   mat[,n.timepoints+3]<- c(correlation_dlt_response,rep(0, times=n.timepoints), correlation_r1_r2, 1)
   mat[n.timepoints+2,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), 1, correlation_r1_r2)
   mat[n.timepoints+3,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), correlation_r1_r2, 1)
+  diag(mat)<-1
   copula<-rmvnorm(n=n.cohorts.all*n.patient.cohort,mean = rep(0, times=n.timepoints+3), sigma = mat)
   
   #compute time of random non-treatment related death
@@ -766,7 +767,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
       eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[1:(n.cohort*n.cohorts.assess),],n.timepoints)
+                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[1:(n.patient.cohort*interim_complete_cohort1),],n.timepoints)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
