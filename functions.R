@@ -677,7 +677,7 @@ trial_design_treatment_policy<- function(general_ls, boin_ls, pro_ls, eff_ls, da
 
 
 #TRIAL DESIGN 
-trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_after_dlt){
+trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
   first.week.assessed<- general_ls[[2]]
@@ -770,7 +770,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_a
           }
         }
       }
-      if(data_after_dlt==FALSE && sum(clin_mat[,4])>0){
+      if(sum(clin_mat[,4])>0){
         eff_dlt<-which(clin_mat[1:(n.patient.cohort*interim_complete_cohort1),4]==1)
         pat_rm<- which(eff[,1] %in% eff_dlt)
         if(length(pat_rm)>0){
@@ -800,7 +800,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_a
           }
         }
       }
-      if(data_after_dlt==FALSE && sum(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4])>0){
+      if(sum(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4])>0){
         eff_dlt<-which(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4]==1)
         pat_rm<- which(eff[,1] %in% (eff_dlt+(n.patient.cohort*interim_complete_cohort1)))
         if(length(pat_rm)>0){
@@ -844,7 +844,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_a
   row.trunc<-c(sapply(1:max(pro[,1]), function (k) pro[pro[,1]==k,3]<=pat_cens[k]))
   pro<- pro[order(pro[,1]),]
   pro<-pro[row.trunc,]
-  if(data_after_dlt==FALSE && sum(clin_mat[,4])>0){
+  if(sum(clin_mat[,4])>0){
     dlt<-which(clin_mat[,4]==1)
     pat_rm<- intersect(which(pro[,1] %in% dlt), which(pro[,3]>4))
     if(length(pat_rm)>0){
