@@ -793,7 +793,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(nrow(eff)+1):(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)),], n.timepoints)
+                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(1:(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)))+max(eff[,1]),], n.timepoints)
       relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
       eff<- rbind(eff,new)
       eff[,1]<- relabel
@@ -834,7 +834,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
                beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
   new<- eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
-                between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(nrow(eff)+1):(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)),], n.timepoints)
+                between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(1:(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)))+max(eff[,1]),], n.timepoints)
   relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
   eff<- rbind(eff,new)
   eff[,1]<- relabel
