@@ -830,13 +830,12 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls, data_a
     i<- k-n.patient.cohort*interim_complete_cohort2
     if(week_trunc[i]<eff.schedule[2]){
       if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-        eff[which(eff[,1]==k), 5]<-eff[which(eff[,1]==k),3] 
-        eff[which(eff[,1]==k), 4]<-0
+        eff[k, 5]<-eff[k,3] 
+        eff[k, 4]<-0
       }else{
-        eff[which(eff[,1]==k), 5]<-0
-        eff[which(eff[,1]==k), 4]<-0
-        eff[which(eff[,1]==k), 3]<-0
-        print(k)
+        eff[k, 5]<-0
+        eff[k, 4]<-0
+        eff[k, 3]<-0
       }
     }
   }
