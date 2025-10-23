@@ -764,7 +764,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
   if(initial_rec[length(initial_rec)]==0){
     return(list(final.rec=NA, boin.admiss=NA, dose.explored=NA, pat.allocated=NA,
-                cdlt = NA, eff=NA, pro=NA))
+                cdlt = NA, eff=NA, pro=NA, ncens=NA, futility1=NA, futility2=NA, futilityfinal=NA, safetyfinal=NA))
   }
   #make next dose decision using BOIN data  
   eff_admiss<- 1:n.doses
