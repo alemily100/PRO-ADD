@@ -110,7 +110,7 @@ for(i in 1:n.sim){
     futility1[i,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
     futility2[i,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
     futilityfinal[i,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
-    safetyfinal[i,]<-val[[i]][[17]]
+    safetyfinal[i,1:length(val[[i]][[17]])]<-val[[i]][[17]]
 }
 
 j<-1
