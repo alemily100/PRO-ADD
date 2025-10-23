@@ -86,7 +86,7 @@ pro.estimate<- matrix(NA, nrow=final.sim, ncol=5)
 n.patient.allocated<- matrix(NA, nrow=final.sim, ncol=5)
 admiss<- matrix(NA, nrow=final.sim, ncol=5)
 loss<- matrix(NA, nrow=final.sim, ncol=5)
-ncens<- matrix(NA, nrow=final.sim, ncol=5)
+ncens<- matrix(NA, nrow=final.sim, ncol=9)
 ndlt<- matrix(NA, nrow=final.sim, ncol=5)
 loss.bb<- matrix(NA, nrow=final.sim, ncol=5)
 futility1<-matrix(NA, nrow=final.sim, ncol=5)
@@ -98,7 +98,6 @@ j<-1
 for(i in 1:n.sim){
   if(sum(is.na(val[[i]][[1]]))==FALSE){
     #final.rec[as.numeric(val[[i]][[1]])]<-final.rec[as.numeric(val[[i]][[1]])]+1
-    ncens[j,val[[i]][[2]]]<- val[[i]][[10]]
     ndlt[j,val[[i]][[2]]]<- val[[i]][[11]]
     efficacy.estimate[j,val[[i]][[2]]]<-val[[i]][[8]]
     pro.estimate[j,val[[i]][[2]]]<-val[[i]][[9]]
