@@ -790,6 +790,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
         }
       }
       eff_admiss<-futility_decision(min_eff, eff[,2], eff[,5], beta_a, beta_b, n.doses)
+      futility1<-ifelse(1:n.doses %in% eff_admiss, 0, 1)
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
@@ -819,6 +820,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
         }
       }
       eff_admiss<-futility_decision(min_eff, eff[,2], eff[,5], beta_a, beta_b, n.doses)
+      futility2<-ifelse(1:n.doses %in% eff_admiss, 0, 1)
     }
     boin.admiss<-intersect(next.recommendation[[2]], eff_admiss)
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
@@ -885,5 +887,5 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   return(list(#final.rec=final, 
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
     cdlt = clin_mat,eff=eff, pro=pro_with_na, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
-    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored]))
+    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2))
 }
