@@ -1,7 +1,8 @@
+setwd("C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/PRO_ADD_resubmission/PRO-ADD")
 #loss for each scenario
 
-shape <- read.csv("C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/shape_param_inc.csv")[,-1]
-rate <- read.csv("C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/rate_param_inc.csv")[1,2]
+shape <- read.csv("shape_param_inc.csv")[,-1]
+rate <- read.csv("rate_param_inc.csv")[1,2]
 
 matrix<- matrix(nrow=5, ncol=9)
 for(i in 1:5){
@@ -50,17 +51,18 @@ mat<- matrix(nrow=6, ncol=5)
 ################
 ### MAIN MANUSCRIPT
 #Table 3 and 4 - Data available after dlt
-mtd<- 3
+mtd<- 5
 target<- 0.9
 
 #optimal
 for(i in 1:6){
-  eval(parse(text=paste0("sc",i,".admiss <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.a.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".loss <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.l.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".mtd <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.mr.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".n <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.n.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".n <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.n.csv')[,-1]")))
   eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
 }
+
 
 
 for(i in 1:6){
@@ -83,9 +85,9 @@ round(mat,2)
 #acceptable
 mat<- matrix(nrow=6, ncol=5)
 for(i in 1:6){
-  eval(parse(text=paste0("sc",i,".admiss <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.a.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".loss <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.l.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".mtd <- read.csv('C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/mayo_clinic/results/sc",i,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
   eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
 }
 for(i in 1:6){
@@ -110,7 +112,9 @@ for(i in 1:6){
 }
 
 colMeans(n.mat)
-mtd
+
+## looked up until here and updated with the new analysis
+
 #Table 3 and 4 - Data not available after dlt (sensitivity analysis 1)
 mtd<- 3
 target<- 0.9
