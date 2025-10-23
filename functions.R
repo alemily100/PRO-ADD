@@ -763,8 +763,15 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   dlt_admiss_time<- clin_set[[3]]
   week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
   if(initial_rec[length(initial_rec)]==0){
-    return(list(final.rec=NA, boin.admiss=NA, dose.explored=NA, pat.allocated=NA,
-                cdlt = NA, eff=NA, pro=NA, ncens=NA, futility1=NA, futility2=NA, futilityfinal=NA, safetyfinal=NA))
+    explored<-unique(clin_mat[,2])
+    allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+    dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+    ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+    return(list(#final.rec=final, 
+      boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+      cdlt = clin_mat,eff=NA, pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+      n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=NA, 
+      futility2=NA, futilityfinal=NA, safetyfinal=dlt_admiss_time))
   }
   #make next dose decision using BOIN data  
   eff_admiss<- 1:n.doses
@@ -779,7 +786,15 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     next.dose<-next.recommendation[[1]]
     
     if(next.dose[length(next.dose)]==0){
-      return(NA)
+      explored<-unique(clin_mat[,2])
+      allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+      dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+      ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      return(list(#final.rec=final, 
+        boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+        cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time))
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
       eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
@@ -843,7 +858,15 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
     next.dose<-next.recommendation[[1]] 
     if(next.dose[length(next.dose)]==0){
-      return(NA)
+      explored<-unique(clin_mat[,2])
+      allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+      dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+      ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      return(list(#final.rec=final, 
+        boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+        cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time))
     }
     print(next.dose)
   }
