@@ -854,7 +854,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   }
   row.trunc<-c(sapply(1:max(pro[,1]), function (k) pro[pro[,1]==k,3]<=pat_cens[k]))
   pro<- pro[order(pro[,1]),]
-  pro<-pro[row.trunc,]
+  pro[!row.trunc,4]<-NA
   if(sum(clin_mat[,4])>0){
     dlt<-which(clin_mat[,4]==1)
     pat_rm<- intersect(which(pro[,1] %in% dlt), which(pro[,3]>4))
@@ -867,6 +867,8 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       eff<- eff[-pat_rm,]
     }
   }
+  pro_with_na<-pro
+  pro<-na.omit(pro)
   #find final recommendation
   loss.est.pipe<-loss.all(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
                           0.5, 0.5, n.sim.final)
@@ -882,6 +884,6 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   
   return(list(#final.rec=final, 
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
-    cdlt = clin_mat,eff=eff, pro=pro, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
+    cdlt = clin_mat,eff=eff, pro=pro_with_na, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
     n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored]))
 }
