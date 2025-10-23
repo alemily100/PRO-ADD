@@ -78,47 +78,44 @@ clusterExport(cl, c("general_list", "boin_list", "pro_list", "eff_list", "n.sim"
 val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical(general_list, boin_list, pro_list, eff_list))
 stopCluster(cl)
 
-final.sim<-sum(sapply(1:n.sim, function (k) sum(is.na(val[[k]][[1]]))==FALSE))
-final.rec<- rep(0, times =5)
-efficacy.estimate<- matrix(NA, nrow=final.sim, ncol=5)
-efficacy.estimate.bb<- matrix(NA, nrow=final.sim, ncol=5)
-pro.estimate<- matrix(NA, nrow=final.sim, ncol=5)
-n.patient.allocated<- matrix(NA, nrow=final.sim, ncol=5)
-admiss<- matrix(NA, nrow=final.sim, ncol=5)
-loss<- matrix(NA, nrow=final.sim, ncol=5)
-ncens<- matrix(NA, nrow=final.sim, ncol=9)
-ndlt<- matrix(NA, nrow=final.sim, ncol=5)
-loss.bb<- matrix(NA, nrow=final.sim, ncol=5)
-futility1<-matrix(NA, nrow=final.sim, ncol=5)
-futility2<-matrix(NA, nrow=final.sim, ncol=5)
-futilityfinal<-matrix(NA, nrow=final.sim, ncol=5)
-safetyfinal<-matrix(NA, nrow=final.sim, ncol=20)
 
-j<-1
+final.rec<- rep(0, times =5)
+efficacy.estimate<- matrix(NA, nrow=n.sim, ncol=5)
+efficacy.estimate.bb<- matrix(NA, nrow=n.sim, ncol=5)
+pro.estimate<- matrix(NA, nrow=n.sim, ncol=5)
+n.patient.allocated<- matrix(NA, nrow=n.sim, ncol=5)
+admiss<- matrix(NA, nrow=n.sim, ncol=5)
+loss<- matrix(NA, nrow=n.sim, ncol=5)
+ncens<- matrix(NA, nrow=n.sim, ncol=9)
+ndlt<- matrix(NA, nrow=n.sim, ncol=5)
+loss.bb<- matrix(NA, nrow=n.sim, ncol=5)
+futility1<-matrix(NA, nrow=n.sim, ncol=5)
+futility2<-matrix(NA, nrow=n.sim, ncol=5)
+futilityfinal<-matrix(NA, nrow=n.sim, ncol=5)
+safetyfinal<-matrix(NA, nrow=n.sim, ncol=20)
+
+
 for(i in 1:n.sim){
-  if(sum(is.na(val[[i]][[1]]))==FALSE){
     #final.rec[as.numeric(val[[i]][[1]])]<-final.rec[as.numeric(val[[i]][[1]])]+1
-    ndlt[j,val[[i]][[2]]]<- val[[i]][[11]]
-    efficacy.estimate[j,val[[i]][[2]]]<-val[[i]][[8]]
-    pro.estimate[j,val[[i]][[2]]]<-val[[i]][[9]]
-    loss[j,val[[i]][[2]]]<- val[[i]][[7]]
-    n.patient.allocated[j,val[[i]][[2]]]<-val[[i]][[3]]
-    efficacy.estimate.bb[j,val[[i]][[2]]]<-val[[i]][[13]]
-    loss.bb[j,val[[i]][[2]]]<- val[[i]][[12]]
-    admiss[j,val[[i]][[1]]]<- 1
-    ncens[j,]<-val[[i]][[10]]
-    ndlt[j,val[[i]][[2]]]<-val[[i]][[11]]
-    futility1[j,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
-    futility2[j,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
-    futilityfinal[j,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
-    safetyfinal[j,]<-val[[i]][[17]]
-    j<-j+1
-  }
+    ndlt[i,val[[i]][[2]]]<- val[[i]][[11]]
+    efficacy.estimate[i,val[[i]][[2]]]<-val[[i]][[8]]
+    pro.estimate[i,val[[i]][[2]]]<-val[[i]][[9]]
+    loss[i,val[[i]][[2]]]<- val[[i]][[7]]
+    n.patient.allocated[i,val[[i]][[2]]]<-val[[i]][[3]]
+    efficacy.estimate.bb[i,val[[i]][[2]]]<-val[[i]][[13]]
+    loss.bb[i,val[[i]][[2]]]<- val[[i]][[12]]
+    admiss[i,val[[i]][[1]]]<- 1
+    ncens[i,]<-val[[i]][[10]]
+    ndlt[i,val[[i]][[2]]]<-val[[i]][[11]]
+    futility1[i,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
+    futility2[i,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
+    futilityfinal[i,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
+    safetyfinal[i,]<-val[[i]][[17]]
 }
 
 j<-1
 mtd.rec<- c()
-mtd.prob<- matrix(ncol=5, nrow=final.sim)
+mtd.prob<- matrix(ncol=5, nrow=n.sim)
 for(i in 1:n.sim){
   if(sum(is.na(val[[i]][[1]]))==FALSE){
     npat<-sapply(1:5, function (k) sum(val[[i]][[4]][,2]==k))
