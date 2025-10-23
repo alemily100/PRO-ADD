@@ -183,8 +183,9 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
       inadmiss<- unique(c(inadmiss, current_dose:n.dose))
     }
     if(length(inadmiss)==n.dose){
+      inadmiss_vec<-1
       dosage<- c(dosage,0)
-      break
+      return(list(M,dosage, inadmiss_vec))
     }
     p.hat<-sum(M[M[,2]==current_dose,4])/sum(M[,2]==current_dose)
     if(p.hat<= esc_bound){
