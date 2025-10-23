@@ -164,6 +164,7 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
 
   i<-current_dose<- 1
   inadmiss<-c()
+  inadmiss_vec<-c()
   acc.dose<- 1:n.dose
   dosage<-c()
   dosage[i]<- current_dose
@@ -199,6 +200,7 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
       dosage<- c(dosage,0)
       break
     }
+    ifelse(length(inadmiss)==0, inadmiss_vec[i]<-0, inadmiss_vec[i]<-min(inadmiss))
     i<- i+1
     dosage[i]<- current_dose
     new.subj<- ((week/between.cohort.wk-1)*n.cohort+1):((week/between.cohort.wk-1)*n.cohort+n.cohort)
@@ -217,7 +219,7 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
       }
     }
   }
-  return(list(M,dosage))
+  return(list(M,dosage, inadmiss_vec))
 }
 
 boin_decision<- function(target, dose, cdlt, esc_bound, n.dose, alpha, beta){
