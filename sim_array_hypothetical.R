@@ -89,6 +89,10 @@ loss<- matrix(NA, nrow=final.sim, ncol=5)
 ncens<- matrix(NA, nrow=final.sim, ncol=5)
 ndlt<- matrix(NA, nrow=final.sim, ncol=5)
 loss.bb<- matrix(NA, nrow=final.sim, ncol=5)
+futility1<-matrix(NA, nrow=final.sim, ncol=5)
+futility2<-matrix(NA, nrow=final.sim, ncol=5)
+futilityfinal<-matrix(NA, nrow=final.sim, ncol=5)
+safetyfinal<-matrix(NA, nrow=final.sim, ncol=20)
 
 j<-1
 for(i in 1:n.sim){
@@ -103,6 +107,12 @@ for(i in 1:n.sim){
     efficacy.estimate.bb[j,val[[i]][[2]]]<-val[[i]][[13]]
     loss.bb[j,val[[i]][[2]]]<- val[[i]][[12]]
     admiss[j,val[[i]][[1]]]<- 1
+    ncens[j,]<-val[[i]][[10]]
+    ndlt[j,val[[i]][[2]]]<-val[[i]][[11]]
+    futility1[j,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
+    futility2[j,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
+    futilityfinal[j,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
+    safetyfinal[j,]<-val[[i]][[17]]
     j<-j+1
   }
 }
@@ -133,5 +143,13 @@ for(i in 1:n.sim){
   write.csv(mtd.prob, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.mp.csv"))
   write.csv(ncens, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.ncens.csv"))
   write.csv(ndlt, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.ndlt.csv"))
-
+  write.csv(futility1, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futility1.csv"))
+  write.csv(futility2, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futility2.csv"))
+  write.csv(futilityfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futilityfinal.csv"))
+  write.csv(safetyfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.safetyfinal.csv"))
 }
+
+saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.general_list")
+saveRDS(boin_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.boin_list")
+saveRDS(pro_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.pro_list")
+saveRDS(eff_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.eff_list")
