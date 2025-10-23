@@ -204,7 +204,7 @@ boin<-function(cdlt.rate, n.cohort,week.assessed, between.cohort.wk, n.dose, esc
     i<- i+1
     dosage[i]<- current_dose
     new.subj<- ((week/between.cohort.wk-1)*n.cohort+1):((week/between.cohort.wk-1)*n.cohort+n.cohort)
-    dlt_uniform<-pnorm(copula[new.subj,1])
+    dlt_uniform<-pnorm(copula[new.subj, 1])
     new.c.dlt<- findInterval(dlt_uniform, cdlt.rate[current_dose], rightmost.closed = TRUE, all.inside = TRUE)
     M<-rbind(M, matrix(c(new.subj, rep(current_dose, times=n.cohort), rep(week.assessed, times=n.cohort), new.c.dlt, rep(week, times=n.cohort)), ncol=5))
     week<- week+between.cohort.wk
@@ -227,11 +227,14 @@ boin_decision<- function(target, dose, cdlt, esc_bound, n.dose, alpha, beta){
   admiss<- c()
   if(mean(cdlt[which(dose==max.d)])<=esc_bound & max.d<n.dose){
     ifelse(max.d+1> n.dose, admiss<- max.d, admiss<- max.d+1)
+    unsafe_dose<-0
   }
   else{
-    admiss<-which(sapply(1:max.d, function (k) 1-pbeta(target,alpha+sum(cdlt[which(dose==k)]),length(which(dose==k))-sum(cdlt[which(dose==k)])+ beta)<=0.95)==TRUE)
+    admissible<-sapply(1:max.d, function (k) 1-pbeta(target,alpha+sum(cdlt[which(dose==k)]),length(which(dose==k))-sum(cdlt[which(dose==k)])+ beta)<=0.95)==TRUE
+    ifelse (sum(admissible)==length(admissible), unsafe_dose<-0, unsafe_dose<-min(which(admissible==FALSE)))
+    admiss<-which(admissible)
   }
-  return(admiss)
+  return(list(admiss, unsafe_dose))
 }
 
 futility_decision<- function(min_target, dose, eff, alpha, beta, n.dose){
@@ -461,13 +464,14 @@ loss.all.bb<- function(pro_data, assessment.time.point, n.iter, runin.prop, n.do
 # }
 
 recommendation<- function(n.dose, target, dose, cdlt, esc_bound, alpha, beta, eff_admiss, n.admiss){
-  admiss<- intersect(boin_decision(target, dose, cdlt, esc_bound, n.dose, alpha, beta), eff_admiss)
+  dlt_admiss<-boin_decision(target, dose, cdlt, esc_bound, n.dose, alpha, beta)
+  admiss<- intersect(dlt_admiss[[1]], eff_admiss)
   #ifelse(length(admiss)==1, rec<- admiss, rec<- sample(admiss, size=1, prob=sqrt(2)-loss.est[[1]][admiss], replace=TRUE))
   if(length(admiss)==0){
     return(list(0,admiss))
   } else {
     ifelse(length(admiss)==1, rec<- admiss, rec<- sample(admiss, size=1, prob=(1/n.admiss)[admiss]))
-    return(list(rec,admiss))
+    return(list(rec,admiss,dlt_admiss[[2]]))
   }
 }
 
@@ -475,7 +479,8 @@ recommendation<- function(n.dose, target, dose, cdlt, esc_bound, alpha, beta, ef
 boin_admiss<- function(target, dose, cdlt, alpha, beta){
   max.d<-max(dose)
   admiss<- c()
-  admiss<-which(sapply(1:max.d, function (k) 1-pbeta(target,1+sum(cdlt[which(dose==k)]),length(which(dose==k))-sum(cdlt[which(dose==k)])+ beta)<=0.95)==TRUE)
+  admissible<-sapply(1:max.d, function (k) 1-pbeta(target,1+sum(cdlt[which(dose==k)]),length(which(dose==k))-sum(cdlt[which(dose==k)])+ beta)<=0.95)==TRUE
+  admiss<-which(admissible)
   return(admiss)
 }
 
@@ -542,6 +547,7 @@ trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls,
                  between.cohort.wk, n.doses, esc_bound, des_bound, target, copula, beta_a_safety, beta_b_safety, cohort_allot_interim1)
   clin_mat<- clin_set[[1]]
   initial_rec<- clin_set[[2]]
+  dlt_admiss_time<- clin_set[[3]]
   week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
   if(initial_rec[length(initial_rec)]==0){
     return(list(final.rec=NA, boin.admiss=NA, dose.explored=NA, pat.allocated=NA,
@@ -552,6 +558,7 @@ trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls,
   next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
   next.dose<-next.recommendation[[1]] 
   boin.admiss<-next.recommendation[[2]]
+  dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
   while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
     #update tables for next dose recommendation
     clin_mat<-boin_next(clin_mat, n.patient.cohort, between.cohort.wk, cdlt_rates,next.dose, copula)
@@ -749,6 +756,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
                  between.cohort.wk, n.doses, esc_bound, des_bound, target, copula, beta_a_safety, beta_b_safety, cohort_allot_interim1)
   clin_mat<- clin_set[[1]]
   initial_rec<- clin_set[[2]]
+  dlt_admiss_time<- clin_set[[3]]
   week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
   if(initial_rec[length(initial_rec)]==0){
     return(list(final.rec=NA, boin.admiss=NA, dose.explored=NA, pat.allocated=NA,
@@ -759,11 +767,13 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
   next.dose<-next.recommendation[[1]] 
   boin.admiss<-next.recommendation[[2]]
+  dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
   while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
     #update tables for next dose recommendation
     clin_mat<-boin_next(clin_mat, n.patient.cohort, between.cohort.wk, cdlt_rates,next.dose, copula)
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
-    next.dose<-next.recommendation[[1]] 
+    next.dose<-next.recommendation[[1]]
+    
     if(next.dose[length(next.dose)]==0){
       return(NA)
     }
@@ -825,6 +835,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       futility2<-ifelse(1:n.doses %in% eff_admiss, 0, 1)
     }
     boin.admiss<-intersect(next.recommendation[[2]], eff_admiss)
+    dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
     next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
     next.dose<-next.recommendation[[1]] 
     if(next.dose[length(next.dose)]==0){
@@ -878,7 +889,10 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
                           0.5, 0.5, n.sim.final)
   loss.est.bb<-loss.all.bb(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
                            0.5, 0.5, n.sim.final)
-  final.admiss<-intersect(boin_admiss(target,clin_mat[,2],clin_mat[,4], beta_a, beta_b), futility_decision(min_eff,eff[,2],eff[,5], beta_a, beta_b, n.doses))
+  final_safety_decision<-boin_admiss(target,clin_mat[,2],clin_mat[,4], beta_a, beta_b)
+  final_futility_decision<-futility_decision(min_eff,eff[,2],eff[,5], beta_a, beta_b, n.doses)
+  futilityfinal<-ifelse(1:n.doses %in% final_futility_decision, 0, 1)
+  final.admiss<-intersect(final_safety_decision,final_futility_decision)
   explored<- unique(clin_mat[,2])
   allocated<- sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
   first_NA <- tapply(pro_with_na$V3[is.na(pro_with_na$score)], pro_with_na$subj[is.na(pro_with_na$score)], min)
@@ -889,5 +903,5 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   return(list(#final.rec=final, 
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
     cdlt = clin_mat,eff=eff, pro=pro_with_na, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
-    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2))
+    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2, futilityfinal=futilityfinal, safetyfinal=dlt_admiss_time))
 }
