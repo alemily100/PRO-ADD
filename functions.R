@@ -324,7 +324,7 @@ f1 <- function(x,t1, t2, prob) {
 }
 
 eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.cohort.wk, eff.schedule, med_survival_month, copula, n.timepoints, correlation_r1_r2){
-  prob_efficacy_sim<-sapply(1:5, function (k) pmvnorm(lower=-Inf, upper=c(qnorm(1-prob_efficacy[k]), qnorm(1-prob_efficacy[k])), mean=c(0,0), corr=matrix(c(1,correlation_r1_r2,correlation_r1_r2,1), nrow=2)))
+  prob_efficacy_sim<-sapply(1:5, function (k) uniroot(find_q,correlation_r1_r2=correlation_r1_r2,target_p=prob_efficacy[k], lower=0, upper=1)$root)
   M<- matrix(nrow=n.cohort*n.cohorts.assess, ncol=6)
   colnames(M)<-c("subj", "dose", "eff1", "eff2", "best.eff", "week_timeline")
   r1_uniform<-pnorm(copula[,n.timepoints+2])
@@ -484,6 +484,10 @@ boin_admiss<- function(target, dose, cdlt, alpha, beta){
   return(admiss)
 }
 
+find_q<-function(q, correlation_r1_r2, target_p){
+  1-pmvnorm(lower=c(-Inf,-Inf), upper=c(qnorm(q),qnorm(q)), mean=c(0,0), 
+            sigma=matrix(c(1,correlation_r1_r2,correlation_r1_r2,1), nrow=2))[1]-target_p
+}
 
 #TRIAL DESIGN 
 #note - treatment policy marks patient after DLT as a non-responder 
