@@ -867,7 +867,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       eff<- eff[-pat_rm,]
     }
   }
-  pro_with_na<-pro
+  pro_with_na<-data.frame(pro)
   pro<-na.omit(pro)
   #find final recommendation
   loss.est.pipe<-loss.all(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
@@ -877,8 +877,8 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   final.admiss<-intersect(boin_admiss(target,clin_mat[,2],clin_mat[,4], beta_a, beta_b), futility_decision(min_eff,eff[,2],eff[,5], beta_a, beta_b, n.doses))
   explored<- unique(clin_mat[,2])
   allocated<- sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
-  cens_val<-cbind(as.numeric(pat_cens<=eff.schedule[2]),clin_mat[,2] )
-  ncens<-sapply(1:n.doses, function (k) sum(cens_val[cens_val[,2]==k,1]))[explored]
+  first_NA <- tapply(pro_with_na$V3[is.na(pro_with_na$score)], pro_with_na$subj[is.na(pro_with_na$score)], min)
+  ncens <- table(factor(first_NA, levels = (0:n.timepoints)*pro.schedule))
   dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
   ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
   
