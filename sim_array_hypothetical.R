@@ -62,7 +62,7 @@ pro_list<- list(pro.schedule=2,beta_shape_sc=pro.scen[[scenario]], beta_rate_sc=
 eff_list<- list(eff.schedule=c(8,16), eff_rates=eff.scen[[scenario]], beta_a=0.1, beta_b=0.9, min_eff=0.1, interim_complete_cohort1=6,
                 interim_complete_cohort2=12)
 
-n.sim<-5000
+n.sim<-5
 cl <- makeCluster(detectCores())
 clusterSetRNGStream(cl,1915)
 invisible(clusterEvalQ(cl,{
@@ -114,20 +114,15 @@ for(i in 1:n.sim){
     safetyfinal[i,1:length(val[[i]][[17]])]<-val[[i]][[17]]
     sample_size[i,]<-c(val[[i]][[18]], val[[i]][[19]])
 }
-
-j<-1
 mtd.rec<- c()
 mtd.prob<- matrix(ncol=5, nrow=n.sim)
 for(i in 1:n.sim){
-  if(sum(is.na(val[[i]][[1]]))==FALSE){
-    npat<-sapply(1:5, function (k) sum(val[[i]][[4]][,2]==k))
-    ntoxi<-sapply(1:5, function (k) sum(val[[i]][[4]][val[[i]][[4]][,2]==k,4]==1))
-    boin<-select.mtd(0.25, npat, ntoxi, cutoff.eli=0.95, extrasafe=FALSE, offset=0.05,
-            boundMTD=FALSE,p.tox=1.4*0.25)
-    mtd.rec[j]<- boin$MTD
-    mtd.prob[j,]<- as.numeric(boin$p_est[,2])
-    j<-j+1
-  }
+  npat<-sapply(1:5, function (k) sum(val[[i]][[4]][,2]==k))
+  ntoxi<-sapply(1:5, function (k) sum(val[[i]][[4]][val[[i]][[4]][,2]==k,4]==1))
+  boin<-select.mtd(0.25, npat, ntoxi, cutoff.eli=0.95, extrasafe=FALSE, offset=0.05,
+                   boundMTD=FALSE,p.tox=1.4*0.25)
+  mtd.rec[i]<- boin$MTD
+  mtd.prob[i,]<- as.numeric(boin$p_est[,2])
 }
   #write.csv(final.rec/n.sim, paste0("/results/sens.sc",scenario,".", mtd,".60.r.csv"))
   write.csv(efficacy.estimate, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.e.csv"))
