@@ -94,7 +94,7 @@ futility1<-matrix(NA, nrow=n.sim, ncol=5)
 futility2<-matrix(NA, nrow=n.sim, ncol=5)
 futilityfinal<-matrix(NA, nrow=n.sim, ncol=5)
 safetyfinal<-matrix(NA, nrow=n.sim, ncol=20)
-
+sample_size<-matrix(NA, nrow=n.sim, ncol=2)
 
 for(i in 1:n.sim){
     #final.rec[as.numeric(val[[i]][[1]])]<-final.rec[as.numeric(val[[i]][[1]])]+1
@@ -112,6 +112,7 @@ for(i in 1:n.sim){
     futility2[i,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
     futilityfinal[i,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
     safetyfinal[i,1:length(val[[i]][[17]])]<-val[[i]][[17]]
+    sample_size[i,]<-c(val[[i]][[18]], val[[i]][[19]])
 }
 
 j<-1
@@ -144,6 +145,7 @@ for(i in 1:n.sim){
   write.csv(futility2, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futility2.csv"))
   write.csv(futilityfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futilityfinal.csv"))
   write.csv(safetyfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.safetyfinal.csv"))
+  write.csv(sample_size, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.samplesize.csv"))
 }
 
 saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.general_list")

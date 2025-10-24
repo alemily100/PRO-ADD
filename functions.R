@@ -763,6 +763,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   initial_rec<- clin_set[[2]]
   dlt_admiss_time<- clin_set[[3]]
   week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
+  sample_module1<-nrow(clin_mat)
   if(initial_rec[length(initial_rec)]==0){
     explored<-unique(clin_mat[,2])
     allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
@@ -772,7 +773,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
       cdlt = clin_mat,eff=NA, pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
       n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=NA, 
-      futility2=NA, futilityfinal=NA, safetyfinal=dlt_admiss_time))
+      futility2=NA, futilityfinal=NA, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=NA))
   }
   #make next dose decision using BOIN data  
   eff_admiss<- 1:n.doses
@@ -791,11 +792,13 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
       dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
       ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      sample_module2<-nrow(clin_mat)-sample_module1
       return(list(#final.rec=final, 
         boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
         cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
         n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
-        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time))
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time,
+        sample_module1=sample_module1, sample_module2=sample_module2))
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
       eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
@@ -863,11 +866,13 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
       dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
       ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      sample_module2<-nrow(clin_mat)-sample_module1
       return(list(#final.rec=final, 
         boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
         cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
         n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
-        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time))
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time, 
+        sample_module1=sample_module1, sample_module2=sample_module2))
     }
     print(next.dose)
   }
@@ -927,9 +932,10 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   ncens <- table(factor(first_NA, levels = (0:n.timepoints)*pro.schedule))
   dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
   ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
-  
+  sample_module2<-nrow(clin_mat)-sample_module1
   return(list(#final.rec=final, 
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
     cdlt = clin_mat,eff=eff, pro=pro_with_na, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
-    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2, futilityfinal=futilityfinal, safetyfinal=dlt_admiss_time))
+    n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2, 
+    futilityfinal=futilityfinal, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=sample_module2))
 }
