@@ -104,6 +104,64 @@ for(j in 1:length(sc",i,".mtd)){
 }
 round(mat,2)
 
+
+################
+#sensitivity - moderate correlation
+mtd<- 5
+target<- 0.9
+
+#optimal
+for(i in 1:6){
+  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".n <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.n.csv')[,-1]")))
+  eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
+}
+
+
+
+for(i in 1:6){
+  eval(parse(text=paste0("
+vec<-rep(0, times=5)
+for(j in 1:length(sc",i,".mtd)){
+  val<-which(sc",i,".loss[j,]==min(sc",i,".loss[j,!is.na(sc",i,".admiss[j,])]))
+  if(length(val)>0){
+    if(sc",i,".loss[j,val]<=target){
+      vec[val]<- vec[val]+1
+    }
+  }
+}"
+  )))
+  mat[i,]<-vec/5000
+}
+round(mat,2)
+
+
+#acceptable
+mat<- matrix(nrow=6, ncol=5)
+for(i in 1:6){
+  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
+}
+for(i in 1:6){
+  eval(parse(text=paste0("
+vec<-rep(0, times=5)
+for(j in 1:length(sc",i,".mtd)){
+  val<-which(sc",i,".loss[j,] %in% sc",i,".loss[j,!is.na(sc",i,".admiss[j,])][sc",i,".loss[j,!is.na(sc",i,".admiss[j,])]<=target])
+  if(length(val)>0){
+      vec[val]<- vec[val]+1
+    }
+}"
+  )))
+  mat[i,]<-vec/5000
+}
+round(mat,2)
+
+
+## looked up until here and updated with the new analysis
 ##### n allocated to each dose 
 n.mat<- matrix(nrow=6, ncol=5)
 for(i in 1:6){
@@ -113,7 +171,7 @@ for(i in 1:6){
 
 colMeans(n.mat)
 
-## looked up until here and updated with the new analysis
+
 
 #Table 3 and 4 - Data not available after dlt (sensitivity analysis 1)
 mtd<- 3
