@@ -104,6 +104,29 @@ for(j in 1:length(sc",i,".mtd)){
 }
 round(mat,2)
 
+#number missing values due to censoring 
+ncens<-matrix(nrow=6, ncol=9)
+for(i in 1:6){
+  eval(parse(text=paste0("sc",i,".ncens <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.ncens.csv')[,-1]")))
+  eval(parse(text=paste0("ncens[",i,",]<-colMeans(t(apply(sc",i,".ncens, 1, cumsum)), na.rm=TRUE)")))
+}
+#average number of dlts (leading to missing response and dlt data)
+ndlt<-matrix(nrow=6, ncol=5)
+for(i in 1:6){
+  eval(parse(text=paste0("sc",i,".ndlt <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.ndlt.csv')[,-1]")))
+  eval(parse(text=paste0("ndlt[",i,",]<-colMeans(t(apply(sc",i,".ndlt, 1, cumsum)), na.rm=TRUE)")))
+}
+
+eval(parse(text=paste0("sc",i,".futility1 <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.futility1.csv')[,-1]")))
+colMeans(sc1.futility1, na.rm=TRUE)
+eval(parse(text=paste0("sc",i,".futility2 <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.futility2.csv')[,-1]")))
+colMeans(sc1.futility2, na.rm=TRUE)
+eval(parse(text=paste0("sc",i,".futilityfinal <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.futilityfinal.csv')[,-1]")))
+colMeans(sc1.futilityfinal, na.rm=TRUE)
+
+eval(parse(text=paste0("sc",i,".safetyfinal <- read.csv('results/hypothetical.dltresp0.5/hypothetical.sc",i,".",mtd,".60.safetyfinal.csv')[,-1]")))
+safety<-t(apply(sc1.safetyfinal, 1, function(x) as.integer(1:5 %in% x)))
+colMeans(safety, na.rm=TRUE)
 
 ################
 #sensitivity - moderate correlation
