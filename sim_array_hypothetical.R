@@ -28,7 +28,7 @@ pro.sc3<- shape[c(1:3,3,3),]
 pro.sc4<- shape[c(1:3,5,5),]
 pro.sc5.6<-shape[,c(1,4,5,6,7,8,9,9,9)]
 
-pro.scen<- list(pro.sc1.2,pro.sc1.2, pro.sc3, pro.sc4, pro.sc5.6, pro.sc5.6)
+pro.scen<- list(pro.sc1.2,pro.sc1.2, pro.sc3, pro.sc4, pro.sc5.6, pro.sc5.6, pro.sc1.2)
 
 eff.sc1<-c(0.05, 0.08, 0.24, 0.42, 0.44)
 eff.sc2<-c(0.05, 0.08, 0.42, 0.42, 0.42)
@@ -36,8 +36,9 @@ eff.sc3<-c(0.05, 0.08, 0.27, 0.28, 0.44)
 eff.sc4<-c(0.05, 0.08, 0.27, 0.27, 0.27)
 eff.sc5<-c(0.05, 0.08, 0.27, 0.42, 0.44)
 eff.sc6<-c(0.05, 0.08, 0.42, 0.42, 0.42)
+eff.sc7<-c(0.05, 0.08, 0.42, 0.42, 0.37)
 
-eff.scen<- list(eff.sc1, eff.sc2, eff.sc3, eff.sc4, eff.sc5, eff.sc6)
+eff.scen<- list(eff.sc1, eff.sc2, eff.sc3, eff.sc4, eff.sc5, eff.sc6, eff.sc7)
 
 dlt.5<- c(0.01, 0.05, 0.10, 0.15, 0.20)
 dlt.3<- c(0.06, 0.13, 0.25, 0.40, 0.50)
@@ -50,7 +51,7 @@ for(m in sc:sc){
 
 general_list<- list(n.patient.cohort=3, first.week.assessed=4, between.cohort.wk=4, n.doses=5,
                     n.timepoints=8,n.toxicity=78,n.grades=5, final.assessment.timepoint=16, mcmc.niter=1250,
-                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=9, correlation_dlt_response=0.5,
+                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=9, correlation_dlt_response=0,
                     correlation_r1_r2=0.7)
 
 boin_list<- list(cdlt_rates=eval(parse(text=paste0("dlt.",mtd))), esc_bound=0.197,des_bound=0.298,target=0.25, beta_a_safety=0.5,beta_b_safety=0.5 )
