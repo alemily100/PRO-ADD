@@ -46,7 +46,7 @@ for(i in 1:6){
 
 round(loss.mat,2)
 
-mat<- matrix(nrow=6, ncol=5)
+mat<- matrix(nrow=7, ncol=5)
 
 ################
 ### MAIN MANUSCRIPT
@@ -55,17 +55,19 @@ mtd<- 5
 target<- 0.9
 
 #optimal
-for(i in 1:6){
-  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".n <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.n.csv')[,-1]")))
-  eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
+for(k in 1:7){
+  eval(parse(text=paste0("sc",k,".admiss <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".loss <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".eff <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.e.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".pro <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.p.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".mtd <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".n <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.n.csv')[,-1]")))
+  eval(parse(text=paste0("for(i in 1:length(sc",k,".mtd)){if(5-sc",k,".mtd[i]>0){sc",k,".admiss[i,(sc",k,".mtd[i]+1):5]<-NA}}")))
 }
 
 
 
-for(i in 1:6){
+for(i in 1:7){
 eval(parse(text=paste0("
 vec<-rep(0, times=5)
 for(j in 1:length(sc",i,".mtd)){
