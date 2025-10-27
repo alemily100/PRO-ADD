@@ -51,7 +51,7 @@ for(m in sc:sc){
 
 general_list<- list(n.patient.cohort=3, first.week.assessed=4, between.cohort.wk=4, n.doses=5,
                     n.timepoints=8,n.toxicity=78,n.grades=5, final.assessment.timepoint=16, mcmc.niter=1250,
-                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=9, correlation_dlt_response=0,
+                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=10, correlation_dlt_response=0,
                     correlation_r1_r2=0.7)
 
 boin_list<- list(cdlt_rates=eval(parse(text=paste0("dlt.",mtd))), esc_bound=0.197,des_bound=0.298,target=0.25, beta_a_safety=0.5,beta_b_safety=0.5 )
@@ -125,25 +125,27 @@ for(i in 1:n.sim){
   mtd.prob[i,]<- as.numeric(boin$p_est[,2])
 }
   #write.csv(final.rec/n.sim, paste0("/results/sens.sc",scenario,".", mtd,".60.r.csv"))
-  write.csv(efficacy.estimate, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.e.csv"))
-  write.csv(efficacy.estimate.bb, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.e.bb.csv"))
-  write.csv(pro.estimate, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.p.csv"))
-  write.csv(loss, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.l.csv"))
-  write.csv(loss.bb, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.l.bb.csv"))
-  write.csv(n.patient.allocated, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.n.csv"))
-  write.csv(admiss, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.a.csv"))
-  write.csv(mtd.rec, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.mr.csv"))
-  write.csv(mtd.prob, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.mp.csv"))
-  write.csv(ncens, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.ncens.csv"))
-  write.csv(ndlt, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.ndlt.csv"))
-  write.csv(futility1, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futility1.csv"))
-  write.csv(futility2, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futility2.csv"))
-  write.csv(futilityfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.futilityfinal.csv"))
-  write.csv(safetyfinal, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.safetyfinal.csv"))
-  write.csv(sample_size, paste0("/home/ealger/pro_add/results/hypothetical/hypothetical.sc",scenario,".", mtd,".60.samplesize.csv"))
+  
+
+  write.csv(efficacy.estimate, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.e.csv"))
+  write.csv(efficacy.estimate.bb, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.e.bb.csv"))
+  write.csv(pro.estimate, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.p.csv"))
+  write.csv(loss, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.l.csv"))
+  write.csv(loss.bb, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.l.bb.csv"))
+  write.csv(n.patient.allocated, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.n.csv"))
+  write.csv(admiss, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.a.csv"))
+  write.csv(mtd.rec, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.mr.csv"))
+  write.csv(mtd.prob, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.mp.csv"))
+  write.csv(ncens, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.ncens.csv"))
+  write.csv(ndlt, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.ndlt.csv"))
+  write.csv(futility1, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.futility1.csv"))
+  write.csv(futility2, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.futility2.csv"))
+  write.csv(futilityfinal, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.futilityfinal.csv"))
+  write.csv(safetyfinal, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.safetyfinal.csv"))
+  write.csv(sample_size, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.samplesize.csv"))
 }
 
-saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.general_list")
-saveRDS(boin_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.boin_list")
-saveRDS(pro_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.pro_list")
-saveRDS(eff_list, file = "/home/ealger/pro_add/results/hypothetical/hypothetical.eff_list")
+saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.general_list")
+saveRDS(boin_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.boin_list")
+saveRDS(pro_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.pro_list")
+saveRDS(eff_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.eff_list")
