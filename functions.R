@@ -412,7 +412,7 @@ for (j in n_patients){
     u[j,1] ~ dmnorm(0, sy)
   }
 #Prior models
-b0 ~ dnorm(0,1/100)
+b0 ~ dnorm(0,1)
 b1[1]<-0
 b1[2]~dnorm(0, 1)
 b1[3]~dnorm(0, 1)
