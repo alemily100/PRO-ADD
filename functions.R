@@ -741,7 +741,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   
   ###stage 1 - create data up until cohort 6
   mat<-diag(2, nrow=n.timepoints+3, ncol=n.timepoints+3)
-  mat<-matrix(rep(0.7, times=(n.timepoints+3)^2), nrow=n.timepoints+3)
+  mat<-matrix(rep(correlation_r1_r2, times=(n.timepoints+3)^2), nrow=n.timepoints+3)
   mat[,n.timepoints+2]<- c(correlation_dlt_response,rep(0, times=n.timepoints), 1,correlation_r1_r2)
   mat[,n.timepoints+3]<- c(correlation_dlt_response,rep(0, times=n.timepoints), correlation_r1_r2, 1)
   mat[n.timepoints+2,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), 1, correlation_r1_r2)
