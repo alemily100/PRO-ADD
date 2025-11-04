@@ -41,7 +41,7 @@ for(m in 1:7){
   size.cohort=3
   n.cohort=20
   toxprob=c(0.01, 0.05, 0.10, 0.15, 0.20)
-  effprob=eff.scen[[i]]
+  effprob=eff.scen[[m]]
   phi = 0.25
   phi1 = 0.197
   phi2 = 0.298
@@ -390,5 +390,5 @@ for(m in 1:7){
                  n.patient = n.patient, prop.select = prop.select, 
                  prop.stop = prop.stop, duration = duration)
   class(result) <- "tite.boinet"
-  result
+  print(result)
 }
