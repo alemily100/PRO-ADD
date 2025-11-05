@@ -19,7 +19,7 @@ for(i in 1:7){
 print(boinet::tite.boinet(
   n.dose=5, start.dose=1, size.cohort=3, n.cohort=20,
   toxprob=c(0.01, 0.05, 0.10, 0.15, 0.20) , effprob=eff.scen[[i]],
-  phi = 0.25, phi1 = 0.197, phi2 = 0.298,
+  phi = 0.25, phi1 = 0.1, phi2 = 0.35,
   delta = 0.6, delta1 = 0.15,
   alpha.T1 = 0.5, alpha.E1 = 0.5, tau.T=28, tau.E=112,
   te.corr = 0.01, gen.event.time = "weibull",
@@ -43,8 +43,8 @@ for(m in 1:7){
   toxprob=c(0.01, 0.05, 0.10, 0.15, 0.20)
   effprob=eff.scen[[m]]
   phi = 0.25
-  phi1 = 0.197
-  phi2 = 0.298
+  phi1 = 0.1
+  phi2 = 0.35
   delta = 0.6 
   delta1 = 0.15
   alpha.T1 = 0.5
@@ -80,8 +80,8 @@ for(m in 1:7){
   ncoh <- size.cohort
   nesc <- n.cohort
   nmax <- ncoh * nesc
-  design.par <- gridoptim(phi = phi, phi1 = phi1, phi2 = phi2, 
-                          delta = delta, delta1 = delta1)
+  design.par <- boinet::gridoptim(phi = phi, phi1 = phi1, phi2 = phi2, 
+                                  delta = delta, delta1 = delta1)
   lambda1 <- design.par$lambda1
   lambda2 <- design.par$lambda2
   eta1 <- design.par$eta1
@@ -131,6 +131,7 @@ for(m in 1:7){
     obs.eff.n <- numeric(n.dose)
     pe <- numeric(n.dose)
     pt <- numeric(n.dose)
+    total.ORR<-numeric(n.dose)
     t.enter <- NULL
     t.decision <- 0
     tite.df <- NULL
@@ -219,6 +220,7 @@ for(m in 1:7){
           n.DLT <- x.DLT + sum(1 - compsub.T$dlt) + 
             sum(t.decision - pendsub.T$enter)/tau.T
           x.ORR <- sum(compsub.E$orr, na.rm=TRUE)
+          total.ORR[ds] <- sum(!is.na(compsub.E$orr))
           n.ORR <- x.ORR + sum(1 - compsub.E$orr, na.rm=TRUE) + 
             sum(t.decision - pendsub.E$enter)/tau.E
           obs.tox[ds] <- x.DLT
@@ -277,8 +279,10 @@ for(m in 1:7){
       po.shape1 <- pr.alpha + obs.tox
       po.shape2 <- pr.beta + (obs.n - obs.tox)
       tterm <- pbeta(phi, po.shape1, po.shape2)
+      obs.n
+      
       po.shape1 <- pr.alpha + obs.eff
-      po.shape2 <- pr.beta + (obs.n - obs.eff)
+      po.shape2 <- pr.beta + (total.ORR - obs.eff)
       eterm <- 1 - pbeta(delta1, po.shape1, po.shape2)
       admflg <- !((eterm < (1 - stopping.prob.E)) | 
                     (tterm < (1 - stopping.prob.T)))
@@ -318,15 +322,16 @@ for(m in 1:7){
     data.dur[ss] <- t.decision
     evadose <- dosen[obs.n != 0]
     obspt <- obs.tox[evadose]/obs.n[evadose]
-    obspe <- obs.eff[evadose]/obs.n[evadose]
+    obspe <- obs.eff[evadose]/total.ORR[evadose]
     tterm.obd <- numeric(n.dose)
     eterm.obd <- numeric(n.dose)
     for (i in evadose) {
       po.shape1 <- pr.alpha + obs.tox[i]
       po.shape2 <- pr.beta + (obs.n[i] - obs.tox[i])
       tterm.obd[i] <- pbeta(phi, po.shape1, po.shape2)
+      
       po.shape1 <- pr.alpha + obs.eff[i]
-      po.shape2 <- pr.beta + (obs.n[i] - obs.eff[i])
+      po.shape2 <- pr.beta + (total.ORR[i] - obs.eff[i])
       eterm.obd[i] <- 1 - pbeta(delta1, po.shape1, 
                                 po.shape2)
     }
