@@ -1017,7 +1017,7 @@ trial_design_hypothetical_all<- function(general_ls, boin_ls, pro_ls, eff_ls){
     return(list(#final.rec=final, 
       boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
       cdlt = clin_mat,eff=NA, pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
-      n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=NA, 
+      n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=NA, 
       futility2=NA, futilityfinal=NA, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=NA))
   }
   #make next dose decision using BOIN data  
@@ -1041,7 +1041,7 @@ trial_design_hypothetical_all<- function(general_ls, boin_ls, pro_ls, eff_ls){
       return(list(#final.rec=final, 
         boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
         cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
-        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
         futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time,
         sample_module1=sample_module1, sample_module2=sample_module2))
     }
@@ -1115,7 +1115,7 @@ trial_design_hypothetical_all<- function(general_ls, boin_ls, pro_ls, eff_ls){
       return(list(#final.rec=final, 
         boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
         cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
-        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
         futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time, 
         sample_module1=sample_module1, sample_module2=sample_module2))
     }
