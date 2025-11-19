@@ -43,7 +43,7 @@ eff.scen<- list(eff.sc1, eff.sc2, eff.sc3, eff.sc4, eff.sc5, eff.sc6, eff.sc7)
 dlt.5<- c(0.01, 0.05, 0.10, 0.15, 0.20)
 dlt.3<- c(0.06, 0.13, 0.25, 0.40, 0.50)
 
-mtd<- 5
+mtd<- 3
 
 for(m in sc:sc){
   scenario<-m
@@ -51,7 +51,7 @@ for(m in sc:sc){
 
 general_list<- list(n.patient.cohort=3, first.week.assessed=4, between.cohort.wk=4, n.doses=5,
                     n.timepoints=8,n.toxicity=78,n.grades=5, final.assessment.timepoint=16, mcmc.niter=1250,
-                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=10, correlation_dlt_response=0,
+                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, median_survival_month=9, correlation_dlt_response=0.15,
                     correlation_r1_r2=0.7)
 
 boin_list<- list(cdlt_rates=eval(parse(text=paste0("dlt.",mtd))), esc_bound=0.197,des_bound=0.298,target=0.25, beta_a_safety=0.5,beta_b_safety=0.5 )
@@ -145,7 +145,7 @@ for(i in 1:n.sim){
   write.csv(sample_size, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.sc",scenario,".", mtd,".60.samplesize.csv"))
 }
 
-saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.general_list")
-saveRDS(boin_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.boin_list")
-saveRDS(pro_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.pro_list")
-saveRDS(eff_list, file = "/home/ealger/pro_add/results/hypothetical.",general_list[[15]],"/hypothetical.eff_list")
+saveRDS(general_list, file = "/home/ealger/pro_add/results/hypothetical.0/hypothetical.general_list")
+saveRDS(boin_list, file = "/home/ealger/pro_add/results/hypothetical.0/hypothetical.boin_list")
+saveRDS(pro_list, file = "/home/ealger/pro_add/results/hypothetical.0/hypothetical.pro_list")
+saveRDS(eff_list, file = "/home/ealger/pro_add/results/hypothetical.0/hypothetical.eff_list")

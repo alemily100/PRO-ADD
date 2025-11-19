@@ -804,18 +804,18 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
                     between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[1:(n.patient.cohort*interim_complete_cohort1),],n.timepoints, correlation_r1_r2)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
-      #for(k in 1:max(eff[,1])){
-      #  if(week_trunc[k]<eff.schedule[2]){
-      #    if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
-      #      eff[which(eff[,1]==k), 5]<-NA
-      #      eff[which(eff[,1]==k), 4]<-NA
-      #    }else{
-      #      eff[which(eff[,1]==k), 5]<-NA
-      #      eff[which(eff[,1]==k), 4]<-NA
-      #      eff[which(eff[,1]==k), 3]<-NA
-      #    }
-      #  }
-      #}
+      for(k in 1:max(eff[,1])){
+        if(week_trunc[k]<eff.schedule[2]){
+          if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+          }else{
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+            eff[which(eff[,1]==k), 3]<-NA
+          }
+        }
+      }
       if(sum(clin_mat[,4])>0){
         eff_dlt<-which(clin_mat[1:(n.patient.cohort*interim_complete_cohort1),4]==1)
         pat_rm<- which(eff[,1] %in% eff_dlt)
@@ -834,19 +834,19 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
       eff<- rbind(eff,new)
       eff[,1]<- relabel
       week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2)]
-      #for(k in (n.patient.cohort*interim_complete_cohort1+1):max(eff[,1])){
-      #  i<- k-n.patient.cohort*interim_complete_cohort1
-      #  if(week_trunc[i]<eff.schedule[2]){
-      #    if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-      #      eff[which(eff[,1]==k), 5]<-NA
-      #      eff[which(eff[,1]==k), 4]<-NA
-      #    }else{
-      #      eff[which(eff[,1]==k), 5]<-NA
-      #      eff[which(eff[,1]==k), 4]<-NA
-      #      eff[which(eff[,1]==k), 3]<-NA
-      #    }
-      #  }
-      #}
+      for(k in (n.patient.cohort*interim_complete_cohort1+1):max(eff[,1])){
+        i<- k-n.patient.cohort*interim_complete_cohort1
+        if(week_trunc[i]<eff.schedule[2]){
+          if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+          }else{
+            eff[which(eff[,1]==k), 5]<-NA
+            eff[which(eff[,1]==k), 4]<-NA
+            eff[which(eff[,1]==k), 3]<-NA
+          }
+        }
+      }
       if(sum(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4])>0){
         eff_dlt<-which(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4]==1)
         pat_rm<- which(eff[,1] %in% (eff_dlt+(n.patient.cohort*interim_complete_cohort1)))
@@ -887,19 +887,19 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   eff<- rbind(eff,new)
   eff[,1]<- relabel
   week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort2+1):(n.patient.cohort*n.cohorts.all)]
-  #for(k in (n.patient.cohort*interim_complete_cohort2+1):max(eff[,1])){
-  #  i<- k-n.patient.cohort*interim_complete_cohort2
-  #  if(week_trunc[i]<eff.schedule[2]){
-  #    if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
-  #      eff[which(eff[,1]==k), 5]<-NA
-  #      eff[which(eff[,1]==k), 4]<-NA
-  #    }else{
-  #      eff[which(eff[,1]==k), 5]<-NA
-  #      eff[which(eff[,1]==k), 4]<-NA
-  #      eff[which(eff[,1]==k), 3]<-NA
-  #    }
-  #  }
-  #}
+  for(k in (n.patient.cohort*interim_complete_cohort2+1):max(eff[,1])){
+    i<- k-n.patient.cohort*interim_complete_cohort2
+    if(week_trunc[i]<eff.schedule[2]){
+      if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
+        eff[which(eff[,1]==k), 5]<-NA
+        eff[which(eff[,1]==k), 4]<-NA
+      }else{
+        eff[which(eff[,1]==k), 5]<-NA
+        eff[which(eff[,1]==k), 4]<-NA
+        eff[which(eff[,1]==k), 3]<-NA
+      }
+    }
+  }
   row.trunc<-c(sapply(1:max(pro[,1]), function (k) pro[pro[,1]==k,3]<=pat_cens[k]))
   pro<- pro[order(pro[,1]),]
   pro[!row.trunc,4]<-NA
