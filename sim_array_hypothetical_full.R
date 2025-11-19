@@ -51,7 +51,7 @@ for(m in sc:sc){
 
 general_list<- list(n.patient.cohort=3, first.week.assessed=4, between.cohort.wk=4, n.doses=5,
                     n.timepoints=8,n.toxicity=78,n.grades=5, final.assessment.timepoint=16, mcmc.niter=1250,
-                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, correlation_dlt_response=0.15,
+                    mcmc.burnin.prop=0.20, n.cohorts.all=20, n.sim.final=600, cop.corr=0.9, correlation_dlt_response=0,
                     correlation_r1_r2=0.7)
 
 boin_list<- list(cdlt_rates=eval(parse(text=paste0("dlt.",mtd))), esc_bound=0.197,des_bound=0.298,target=0.25, beta_a_safety=0.5,beta_b_safety=0.5 )
