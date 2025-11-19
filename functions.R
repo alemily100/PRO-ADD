@@ -324,7 +324,7 @@ f1 <- function(x,t1, t2, prob) {
   (1-prob)-(t1 + x*(1-t1))*(t2+x*(1-t2))
 }
 
-eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.cohort.wk, eff.schedule, med_survival_month, copula, n.timepoints, correlation_r1_r2){
+eff_sim<- function(n.cohort, n.cohorts.assess, prob_efficacy, c_dose,between.cohort.wk, eff.schedule, copula, n.timepoints, correlation_r1_r2){
   prob_efficacy_sim<-sapply(1:5, function (k) uniroot(find_q,correlation_r1_r2=correlation_r1_r2,target_p=prob_efficacy[k], lower=0, upper=1)$root)
   M<- matrix(nrow=n.cohort*n.cohorts.assess, ncol=6)
   colnames(M)<-c("subj", "dose", "eff1", "eff2", "best.eff", "week_timeline")
@@ -573,7 +573,7 @@ trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls,
       return(NA)
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
-      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], between.cohort.wk, eff.schedule)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
@@ -598,7 +598,7 @@ trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls,
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1)
+                    between.cohort.wk, eff.schedule)
       relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
       eff<- rbind(eff,new)
       eff[,1]<- relabel
@@ -696,7 +696,7 @@ trial_design_treatment_policy_composite_variable<- function(general_ls, boin_ls,
 
 
 #TRIAL DESIGN 
-trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
+trial_design_hypothetical_partial<- function(general_ls, boin_ls, pro_ls, eff_ls){
   #general inputs
   n.patient.cohort<- general_ls[[1]]
   first.week.assessed<- general_ls[[2]]
@@ -802,7 +802,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
       eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[1:(n.patient.cohort*interim_complete_cohort1),],n.timepoints, correlation_r1_r2)
+                    between.cohort.wk, eff.schedule, copula[1:(n.patient.cohort*interim_complete_cohort1),],n.timepoints, correlation_r1_r2)
       week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
       for(k in 1:max(eff[,1])){
         if(week_trunc[k]<eff.schedule[2]){
@@ -829,7 +829,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     }
     if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
       new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
-                    between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(1:(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
+                    between.cohort.wk, eff.schedule, copula[(1:(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
       relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
       eff<- rbind(eff,new)
       eff[,1]<- relabel
@@ -882,7 +882,7 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
   pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
                beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
   new<- eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
-                between.cohort.wk, eff.schedule, general_ls[[14]]-1, copula[(1:(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
+                between.cohort.wk, eff.schedule, copula[(1:(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
   relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
   eff<- rbind(eff,new)
   eff[,1]<- relabel
@@ -937,5 +937,250 @@ trial_design_hypothetical<- function(general_ls, boin_ls, pro_ls, eff_ls){
     boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
     cdlt = clin_mat,eff=eff, pro=pro_with_na, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
     n_cens=ncens,n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2, 
+    futilityfinal=futilityfinal, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=sample_module2))
+}
+
+
+trial_design_hypothetical_all<- function(general_ls, boin_ls, pro_ls, eff_ls){
+  #general inputs
+  n.patient.cohort<- general_ls[[1]]
+  first.week.assessed<- general_ls[[2]]
+  between.cohort.wk<-general_ls[[3]]
+  n.doses<-general_ls[[4]]
+  n.timepoints<-general_ls[[5]]
+  n.toxicity<- general_ls[[6]]
+  n.grades<- general_ls[[7]]
+  final.assessment.timepoint<-general_ls[[8]]
+  mcmc.niter<-general_ls[[9]]
+  mcmc.burnin.prop<- general_ls[[10]]
+  n.cohorts.all<- general_ls[[11]]
+  n.sim.final<- general_ls[[12]]
+  cop.corr<- general_ls[[13]]
+  n.sim.final<- mcmc.niter*(1-mcmc.burnin.prop)
+  correlation_dlt_response<-general_ls[[14]]
+  correlation_r1_r2<- general_ls[[15]]
+  #dlt inputs 
+  cdlt_rates<- boin_ls[[1]]
+  esc_bound<- boin_ls[[2]]
+  des_bound<- boin_ls[[3]]
+  target<- boin_ls[[4]]
+  beta_a_safety<- boin_ls[[5]]
+  beta_b_safety<- boin_ls[[6]]
+  
+  #pro_inputs
+  pro.schedule<-pro_ls[[1]]
+  beta_shape_sc<- pro_ls[[2]]
+  beta_rate_sc<- pro_ls[[3]]
+  pro.between.cohort.timepoints<-pro_ls[[4]]
+  max.pro<- pro_ls[[5]]
+  
+  #eff inputs
+  eff.schedule<- eff_ls[[1]]
+  eff_rates<-eff_ls[[2]]
+  beta_a<- eff_ls[[3]]
+  beta_b<- eff_ls[[4]]
+  min_eff<- eff_ls[[5]]
+  interim_complete_cohort1<- eff_ls[[6]]
+  interim_complete_cohort2<- eff_ls[[7]]
+  
+  
+  ###stage 1 - create data up until cohort 6
+  mat<-diag(2, nrow=n.timepoints+3, ncol=n.timepoints+3)
+  mat<-matrix(rep(correlation_r1_r2, times=(n.timepoints+3)^2), nrow=n.timepoints+3)
+  mat[,n.timepoints+2]<- c(correlation_dlt_response,rep(0, times=n.timepoints), 1,correlation_r1_r2)
+  mat[,n.timepoints+3]<- c(correlation_dlt_response,rep(0, times=n.timepoints), correlation_r1_r2, 1)
+  mat[n.timepoints+2,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), 1, correlation_r1_r2)
+  mat[n.timepoints+3,]<- c(correlation_dlt_response, rep(0, times=n.timepoints), correlation_r1_r2, 1)
+  diag(mat)<-1
+  copula<-rmvnorm(n=n.cohorts.all*n.patient.cohort,mean = rep(0, times=n.timepoints+3), sigma = mat)
+  
+  #compute time of random non-treatment related death
+  #median_survival_month<- (general_ls[[14]]-1)
+  #lambda<- log(2)/(median_survival_month*4)
+  #pat_cens<-rexp(n.patient.cohort*n.cohorts.all, lambda)+first.week.assessed
+  wk_interim1<- eff.schedule[2]+(interim_complete_cohort1-1)*between.cohort.wk
+  wk_interim2<- eff.schedule[2]+(interim_complete_cohort2-1)*between.cohort.wk
+  cohort_allot_interim1<-(wk_interim1/between.cohort.wk)+1 
+  cohort_allot_interim2<-(wk_interim2/between.cohort.wk)+1 
+  clin_set<-boin(cdlt_rates, n.patient.cohort, first.week.assessed, 
+                 between.cohort.wk, n.doses, esc_bound, des_bound, target, copula, beta_a_safety, beta_b_safety, cohort_allot_interim1)
+  clin_mat<- clin_set[[1]]
+  initial_rec<- clin_set[[2]]
+  dlt_admiss_time<- clin_set[[3]]
+  week<- ((nrow(clin_mat)/n.patient.cohort+1)*between.cohort.wk)-between.cohort.wk
+  sample_module1<-nrow(clin_mat)
+  if(initial_rec[length(initial_rec)]==0){
+    explored<-unique(clin_mat[,2])
+    allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+    dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+    ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+    return(list(#final.rec=final, 
+      boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+      cdlt = clin_mat,eff=NA, pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+      n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=NA, 
+      futility2=NA, futilityfinal=NA, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=NA))
+  }
+  #make next dose decision using BOIN data  
+  eff_admiss<- 1:n.doses
+  next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
+  next.dose<-next.recommendation[[1]] 
+  boin.admiss<-next.recommendation[[2]]
+  dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
+  while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
+    #update tables for next dose recommendation
+    clin_mat<-boin_next(clin_mat, n.patient.cohort, between.cohort.wk, cdlt_rates,next.dose, copula)
+    next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
+    next.dose<-next.recommendation[[1]]
+    
+    if(next.dose[length(next.dose)]==0){
+      explored<-unique(clin_mat[,2])
+      allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+      dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+      ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      sample_module2<-nrow(clin_mat)-sample_module1
+      return(list(#final.rec=final, 
+        boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+        cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time,
+        sample_module1=sample_module1, sample_module2=sample_module2))
+    }
+    if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim1){
+      eff<- eff_sim(n.patient.cohort, interim_complete_cohort1, eff_rates, clin_mat[(1:interim_complete_cohort1)*n.patient.cohort,2], 
+                    between.cohort.wk, eff.schedule, copula[1:(n.patient.cohort*interim_complete_cohort1),],n.timepoints, correlation_r1_r2)
+      #week_trunc<-pat_cens[1:(n.patient.cohort*interim_complete_cohort1)]
+      #for(k in 1:max(eff[,1])){
+      #  if(week_trunc[k]<eff.schedule[2]){
+      #    if(week_trunc[k]>=eff.schedule[1]+1 & week_trunc[k]<eff.schedule[2]){
+      #      eff[which(eff[,1]==k), 5]<-NA
+      #      eff[which(eff[,1]==k), 4]<-NA
+      #    }else{
+      #      eff[which(eff[,1]==k), 5]<-NA
+      #      eff[which(eff[,1]==k), 4]<-NA
+      #      eff[which(eff[,1]==k), 3]<-NA
+      #    }
+      #  }
+      #}
+      #if(sum(clin_mat[,4])>0){
+      #  eff_dlt<-which(clin_mat[1:(n.patient.cohort*interim_complete_cohort1),4]==1)
+      #  pat_rm<- which(eff[,1] %in% eff_dlt)
+      #  if(length(pat_rm)>0){
+      #    #eff[pat_rm,c(3,4,5)]<- rep(0, times=3)
+      #    eff<- eff[-pat_rm,]
+      #  }
+      #}
+      eff_admiss<-futility_decision(min_eff, eff[,2], eff[,5], beta_a, beta_b, n.doses)
+      futility1<-ifelse(1:n.doses %in% eff_admiss, 0, 1)
+    }
+    if(max(clin_mat[,1])/n.patient.cohort==cohort_allot_interim2){
+      new<- eff_sim(n.patient.cohort, cohort_allot_interim2-cohort_allot_interim1, eff_rates, clin_mat[((interim_complete_cohort1+1):(interim_complete_cohort2))*n.patient.cohort,2],
+                    between.cohort.wk, eff.schedule, copula[(1:(n.patient.cohort*(cohort_allot_interim2-cohort_allot_interim1)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
+      relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
+      eff<- rbind(eff,new)
+      eff[,1]<- relabel
+      #week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2)]
+      #for(k in (n.patient.cohort*interim_complete_cohort1+1):max(eff[,1])){
+      #  i<- k-n.patient.cohort*interim_complete_cohort1
+      #  if(week_trunc[i]<eff.schedule[2]){
+      #    if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
+      #      eff[which(eff[,1]==k), 5]<-NA
+      #      eff[which(eff[,1]==k), 4]<-NA
+      #    }else{
+      #      eff[which(eff[,1]==k), 5]<-NA
+      #      eff[which(eff[,1]==k), 4]<-NA
+      #      eff[which(eff[,1]==k), 3]<-NA
+      #    }
+      #  }
+      #}
+      #if(sum(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4])>0){
+      #  eff_dlt<-which(clin_mat[(n.patient.cohort*interim_complete_cohort1+1):(n.patient.cohort*interim_complete_cohort2),4]==1)
+      #  pat_rm<- which(eff[,1] %in% (eff_dlt+(n.patient.cohort*interim_complete_cohort1)))
+      #  if(length(pat_rm)>0){
+      #    eff<- eff[-pat_rm,]
+      #  }
+      #}
+      eff_admiss<-futility_decision(min_eff, eff[,2], eff[,5], beta_a, beta_b, n.doses)
+      futility2<-ifelse(1:n.doses %in% eff_admiss, 0, 1)
+    }
+    boin.admiss<-intersect(next.recommendation[[2]], eff_admiss)
+    dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
+    next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
+    next.dose<-next.recommendation[[1]] 
+    if(next.dose[length(next.dose)]==0){
+      explored<-unique(clin_mat[,2])
+      allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+      dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+      ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+      sample_module2<-nrow(clin_mat)-sample_module1
+      return(list(#final.rec=final, 
+        boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+        cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+        n_cens=NA,n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+        futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time, 
+        sample_module1=sample_module1, sample_module2=sample_module2))
+    }
+    print(next.dose)
+  }
+  #stage 2 - evaluate right at the end of the trial 
+  c_dose<- clin_mat[(1:n.cohorts.all)*n.patient.cohort,2]
+  #create pro matrix
+  pro<-pro_sim(n.patient.cohort, n.cohorts.all, n.timepoints, pro.schedule, c_dose, 
+               beta_shape_sc, beta_rate_sc, copula, between.cohort.wk)
+  new<- eff_sim(n.patient.cohort, length((interim_complete_cohort2+1):n.cohorts.all), eff_rates, c_dose[(interim_complete_cohort2+1):n.cohorts.all],
+                between.cohort.wk, eff.schedule, copula[(1:(n.patient.cohort*length((interim_complete_cohort2+1):n.cohorts.all)))+max(eff[,1]),], n.timepoints, correlation_r1_r2)
+  relabel<- c(eff[,1], seq(from=(max(eff[,1])+1), by=1, length.out=nrow(new)))
+  eff<- rbind(eff,new)
+  eff[,1]<- relabel
+  #week_trunc<-pat_cens[(n.patient.cohort*interim_complete_cohort2+1):(n.patient.cohort*n.cohorts.all)]
+  #for(k in (n.patient.cohort*interim_complete_cohort2+1):max(eff[,1])){
+  #  i<- k-n.patient.cohort*interim_complete_cohort2
+  #  if(week_trunc[i]<eff.schedule[2]){
+  #    if(week_trunc[i]>=eff.schedule[1]+1 & week_trunc[i]<eff.schedule[2]){
+  #      eff[which(eff[,1]==k), 5]<-NA
+  #      eff[which(eff[,1]==k), 4]<-NA
+  #    }else{
+  #      eff[which(eff[,1]==k), 5]<-NA
+  #      eff[which(eff[,1]==k), 4]<-NA
+  #      eff[which(eff[,1]==k), 3]<-NA
+  #    }
+  #  }
+  #}
+  #row.trunc<-c(sapply(1:max(pro[,1]), function (k) pro[pro[,1]==k,3]<=pat_cens[k]))
+  #pro<- pro[order(pro[,1]),]
+  #pro[!row.trunc,4]<-NA
+  #if(sum(clin_mat[,4])>0){
+  #  dlt<-which(clin_mat[,4]==1)
+  #  pat_rm<- intersect(which(pro[,1] %in% dlt), which(pro[,3]>4))
+  #  if(length(pat_rm)>0){
+  #    pro<-pro[-pat_rm,]
+  #  }
+  #  eff_dlt<-which(clin_mat[(n.patient.cohort*interim_complete_cohort2+1):(n.patient.cohort*n.cohorts.all),4]==1)
+  #  pat_rm<- which(eff[,1] %in% (eff_dlt+n.patient.cohort*interim_complete_cohort2))
+  #  if(length(pat_rm)>0){
+  #    eff<- eff[-pat_rm,]
+  #  }
+  #}
+  #pro_with_na<-data.frame(pro)
+  #pro<-na.omit(pro)
+  #find final recommendation
+  loss.est.pipe<-loss.all(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
+                          0.5, 0.5, n.sim.final)
+  loss.est.bb<-loss.all.bb(pro, final.assessment.timepoint, mcmc.niter, mcmc.burnin.prop, n.doses, eff,
+                           0.5, 0.5, n.sim.final)
+  final_safety_decision<-boin_admiss(target,clin_mat[,2],clin_mat[,4], beta_a, beta_b)
+  final_futility_decision<-futility_decision(min_eff,eff[,2],eff[,5], beta_a, beta_b, n.doses)
+  futilityfinal<-ifelse(1:n.doses %in% final_futility_decision, 0, 1)
+  final.admiss<-intersect(final_safety_decision,final_futility_decision)
+  explored<- unique(clin_mat[,2])
+  allocated<- sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+  #first_NA <- tapply(pro_with_na$V3[is.na(pro_with_na$score)], pro_with_na$subj[is.na(pro_with_na$score)], min)
+  #ncens <- table(factor(first_NA, levels = (0:n.timepoints)*pro.schedule))
+  dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+  ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+  sample_module2<-nrow(clin_mat)-sample_module1
+  return(list(#final.rec=final, 
+    boin.admiss=final.admiss, dose.explored=explored, pat.allocated=allocated[explored],
+    cdlt = clin_mat,eff=eff, pro=pro, loss_est=loss.est.pipe[[1]][explored], eff_est=loss.est.pipe[[3]][explored], pro_est=loss.est.pipe[[2]][explored], 
+    n_dlt= ndlt, loss_est_bb=loss.est.bb[[1]][explored], eff_est_bb= loss.est.bb[[3]][explored], futility1=futility1, futility2=futility2, 
     futilityfinal=futilityfinal, safetyfinal=dlt_admiss_time, sample_module1=sample_module1, sample_module2=sample_module2))
 }
