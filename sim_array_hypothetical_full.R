@@ -77,7 +77,7 @@ invisible(clusterEvalQ(cl,{
   source("functions.R")
 }))
 clusterExport(cl, c("general_list", "boin_list", "pro_list", "eff_list", "n.sim"))
-val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical_partial(general_list, boin_list, pro_list, eff_list))
+val<-parLapply(cl, 1:n.sim, function (k) trial_design_hypothetical_all(general_list, boin_list, pro_list, eff_list))
 stopCluster(cl)
 
 
@@ -88,7 +88,7 @@ pro.estimate<- matrix(NA, nrow=n.sim, ncol=5)
 n.patient.allocated<- matrix(NA, nrow=n.sim, ncol=5)
 admiss<- matrix(NA, nrow=n.sim, ncol=5)
 loss<- matrix(NA, nrow=n.sim, ncol=5)
-ncens<- matrix(NA, nrow=n.sim, ncol=9)
+#ncens<- matrix(NA, nrow=n.sim, ncol=9)
 ndlt<- matrix(NA, nrow=n.sim, ncol=5)
 loss.bb<- matrix(NA, nrow=n.sim, ncol=5)
 futility1<-matrix(NA, nrow=n.sim, ncol=5)
@@ -99,21 +99,21 @@ sample_size<-matrix(NA, nrow=n.sim, ncol=2)
 
 for(i in 1:n.sim){
     #final.rec[as.numeric(val[[i]][[1]])]<-final.rec[as.numeric(val[[i]][[1]])]+1
-    ndlt[i,val[[i]][[2]]]<- val[[i]][[11]]
+    ndlt[i,val[[i]][[2]]]<- val[[i]][[10]]
     efficacy.estimate[i,val[[i]][[2]]]<-val[[i]][[8]]
     pro.estimate[i,val[[i]][[2]]]<-val[[i]][[9]]
     loss[i,val[[i]][[2]]]<- val[[i]][[7]]
     n.patient.allocated[i,val[[i]][[2]]]<-val[[i]][[3]]
-    efficacy.estimate.bb[i,val[[i]][[2]]]<-val[[i]][[13]]
-    loss.bb[i,val[[i]][[2]]]<- val[[i]][[12]]
+    efficacy.estimate.bb[i,val[[i]][[2]]]<-val[[i]][[12]]
+    loss.bb[i,val[[i]][[2]]]<- val[[i]][[11]]
     admiss[i,val[[i]][[1]]]<- 1
-    ncens[i,]<-val[[i]][[10]]
-    ndlt[i,val[[i]][[2]]]<-val[[i]][[11]]
-    futility1[i,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
-    futility2[i,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
-    futilityfinal[i,val[[i]][[2]]]<-(val[[i]][[16]])[val[[i]][[2]]]
-    safetyfinal[i,1:length(val[[i]][[17]])]<-val[[i]][[17]]
-    sample_size[i,]<-c(val[[i]][[18]], val[[i]][[19]])
+    #ncens[i,]<-val[[i]][[10]]
+    ndlt[i,val[[i]][[2]]]<-val[[i]][[10]]
+    futility1[i,val[[i]][[2]]]<-(val[[i]][[13]])[val[[i]][[2]]]
+    futility2[i,val[[i]][[2]]]<-(val[[i]][[14]])[val[[i]][[2]]]
+    futilityfinal[i,val[[i]][[2]]]<-(val[[i]][[15]])[val[[i]][[2]]]
+    safetyfinal[i,1:length(val[[i]][[16]])]<-val[[i]][[16]]
+    sample_size[i,]<-c(val[[i]][[17]], val[[i]][[18]])
 }
 mtd.rec<- c()
 mtd.prob<- matrix(ncol=5, nrow=n.sim)
@@ -137,7 +137,7 @@ for(i in 1:n.sim){
   write.csv(admiss, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.a.csv"))
   write.csv(mtd.rec, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.mr.csv"))
   write.csv(mtd.prob, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.mp.csv"))
-  write.csv(ncens, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.ncens.csv"))
+  #write.csv(ncens, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.ncens.csv"))
   write.csv(ndlt, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.ndlt.csv"))
   write.csv(futility1, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.futility1.csv"))
   write.csv(futility2, paste0("/home/ealger/pro_add/results/hypothetical.",general_list[[14]],".full/hypothetical.sc",scenario,".", mtd,".60.futility2.csv"))
