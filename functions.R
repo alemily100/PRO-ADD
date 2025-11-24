@@ -780,6 +780,19 @@ trial_design_hypothetical_partial<- function(general_ls, boin_ls, pro_ls, eff_ls
   next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
   next.dose<-next.recommendation[[1]] 
   boin.admiss<-next.recommendation[[2]]
+  if(next.dose[length(next.dose)]==0){
+    explored<-unique(clin_mat[,2])
+    allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+    dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+    ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+    sample_module2<-nrow(clin_mat)-sample_module1
+    return(list(#final.rec=final, 
+      boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+      cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+      n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+      futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time,
+      sample_module1=sample_module1, sample_module2=sample_module2))
+  }
   dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
   while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
     #update tables for next dose recommendation
@@ -1025,6 +1038,20 @@ trial_design_hypothetical_all<- function(general_ls, boin_ls, pro_ls, eff_ls){
   next.recommendation<-recommendation(n.doses,target, clin_mat[,2], clin_mat[,4], esc_bound, beta_a_safety, beta_b_safety, eff_admiss, as.numeric(table(clin_mat[,2])))
   next.dose<-next.recommendation[[1]] 
   boin.admiss<-next.recommendation[[2]]
+  if(next.dose[length(next.dose)]==0){
+    explored<-unique(clin_mat[,2])
+    allocated<-sapply(1:n.doses, function (k) nrow(clin_mat[clin_mat[,2]==k,]))
+    dlt_val<- cbind(clin_mat[,4],clin_mat[,2])
+    ndlt<-sapply(1:n.doses, function (k) sum(dlt_val[dlt_val[,2]==k,1]))[explored]
+    sample_module2<-nrow(clin_mat)-sample_module1
+    return(list(#final.rec=final, 
+      boin.admiss=NA, dose.explored=explored, pat.allocated=allocated[explored],
+      cdlt = clin_mat,eff=ifelse(exists("eff")==TRUE, eff, NA), pro=NA, loss_est=NA, eff_est=NA, pro_est=NA, 
+      n_dlt=ndlt, loss_est_bb=NA, eff_est_bb=NA, futility1=ifelse(exists("futility1")==TRUE, futility1, NA), 
+      futility2=ifelse(exists("futility2")==TRUE, futility2, NA), futilityfinal=NA, safetyfinal=dlt_admiss_time,
+      sample_module1=sample_module1, sample_module2=sample_module2))
+  }
+  dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
   dlt_admiss_time[length(dlt_admiss_time)+1]<-next.recommendation[[3]]
   while(nrow(clin_mat)<n.cohorts.all*n.patient.cohort){
     #update tables for next dose recommendation
