@@ -14,7 +14,7 @@ pro.sc3<- shape[c(1:3,3,3),]
 pro.sc4<- shape[c(1:3,5,5),]
 pro.sc5.6<-shape[,c(1,4,5,6,7,8,9,9,9)]
 
-pro.scen<- list(pro.sc1.2,pro.sc1.2, pro.sc3, pro.sc4, pro.sc5.6, pro.sc5.6)
+pro.scen<- list(pro.sc1.2,pro.sc1.2, pro.sc3, pro.sc4, pro.sc5.6, pro.sc5.6, pro.sc1.2, pro.sc1.2)
 
 
 eff.sc1<-c(0.05, 0.08, 0.24, 0.42, 0.44)
@@ -23,12 +23,14 @@ eff.sc3<-c(0.05, 0.08, 0.27, 0.28, 0.44)
 eff.sc4<-c(0.05, 0.08, 0.27, 0.27, 0.27)
 eff.sc5<-c(0.05, 0.08, 0.27, 0.42, 0.44)
 eff.sc6<-c(0.05, 0.08, 0.42, 0.42, 0.42)
+eff.sc7<-c(0.05, 0.08, 0.42, 0.42, 0.37)
+eff.sc8<-c(0.27, 0.29, 0.29, 0.29, 0.29)
 
-eff.scen<- list(eff.sc1, eff.sc2, eff.sc3, eff.sc4, eff.sc5, eff.sc6)
+eff.scen<- list(eff.sc1, eff.sc2, eff.sc3, eff.sc4, eff.sc5, eff.sc6, eff.sc7, eff.sc8)
 
 
 matrix.list<- list()
-for(j in 1:6){
+for(j in 1:8){
   matrix<- matrix(nrow=5, ncol=9)
   for(i in 1:5){
     matrix[i,]<-sapply(1:9, function (k) pro.scen[[j]][i,k]/(pro.scen[[j]][i,k]+rate))
@@ -39,35 +41,36 @@ for(j in 1:6){
 #Results and recommendations 
 loss.target<-sqrt(0^2 + (1-0.1)^2)
 
-loss.mat<- matrix(nrow=6, ncol=5)
-for(i in 1:6){
+loss.mat<- matrix(nrow=8, ncol=5)
+for(i in 1:8){
   loss.mat[i,]<-sqrt(matrix.list[[i]][,9]^2 + (1-eff.scen[[i]])^2)
 }
 
 round(loss.mat,2)
 
-mat<- matrix(nrow=7, ncol=5)
+mat<- matrix(nrow=8, ncol=5)
 
 ################
 ### MAIN MANUSCRIPT
-#Table 3 and 4 - Data available after dlt
 mtd<- 5
 target<- 0.9
+data<-"full"
+correlation<-0
 
 #optimal
-for(k in 1:7){
-  eval(parse(text=paste0("sc",k,".admiss <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.a.csv')[,-1]")))
-  eval(parse(text=paste0("sc",k,".loss <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.l.csv')[,-1]")))
-  eval(parse(text=paste0("sc",k,".eff <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.e.csv')[,-1]")))
-  eval(parse(text=paste0("sc",k,".pro <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.p.csv')[,-1]")))
-  eval(parse(text=paste0("sc",k,".mtd <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.mr.csv')[,-1]")))
-  eval(parse(text=paste0("sc",k,".n <- read.csv('results/hypothetical/hypothetical.sc",k,".",mtd,".60.n.csv')[,-1]")))
+for(k in 1:8){
+  eval(parse(text=paste0("sc",k,".admiss <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".loss <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".eff <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.e.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".pro <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.p.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".mtd <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.mr.csv')[,-1]")))
+  eval(parse(text=paste0("sc",k,".n <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",k,".",mtd,".60.n.csv')[,-1]")))
   eval(parse(text=paste0("for(i in 1:length(sc",k,".mtd)){if(5-sc",k,".mtd[i]>0){sc",k,".admiss[i,(sc",k,".mtd[i]+1):5]<-NA}}")))
 }
 
 
 
-for(i in 1:7){
+for(i in 1:8){
 eval(parse(text=paste0("
 vec<-rep(0, times=5)
 for(j in 1:length(sc",i,".mtd)){
@@ -83,16 +86,15 @@ for(j in 1:length(sc",i,".mtd)){
 }
 round(mat,2)
 
-
 #acceptable
-mat<- matrix(nrow=6, ncol=5)
-for(i in 1:6){
-  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
-  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
+mat<- matrix(nrow=8, ncol=5)
+for(i in 1:8){
+  eval(parse(text=paste0("sc",i,".admiss <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",i,".",mtd,".60.a.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".loss <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",i,".",mtd,".60.l.csv')[,-1]")))
+  eval(parse(text=paste0("sc",i,".mtd <- read.csv('results/hypothetical.",correlation,".",data,"/hypothetical.sc",i,".",mtd,".60.mr.csv')[,-1]")))
   eval(parse(text=paste0("for(i in 1:length(sc",i,".mtd)){if(5-sc",i,".mtd[i]>0){sc",i,".admiss[i,(sc",i,".mtd[i]+1):5]<-NA}}")))
 }
-for(i in 1:6){
+for(i in 1:8){
   eval(parse(text=paste0("
 vec<-rep(0, times=5)
 for(j in 1:length(sc",i,".mtd)){
