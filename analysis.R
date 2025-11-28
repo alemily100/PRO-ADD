@@ -52,9 +52,9 @@ mat<- matrix(nrow=8, ncol=5)
 
 ################
 ### MAIN MANUSCRIPT
-mtd<- 5
+mtd<- 3
 target<- 0.9
-data<-"full"
+data<-"partial"
 correlation<-0
 
 #optimal
@@ -84,7 +84,9 @@ for(j in 1:length(sc",i,".mtd)){
 )))
   mat[i,]<-vec/5000
 }
-round(mat,2)
+
+mat<-cbind(mat,1-rowSums(mat))
+write.csv(round(mat,2), paste0("C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/PRO_ADD_resubmission/resubmission/tables/supplementary/optimal.MTD",mtd,".",correlation,".",data,".csv"))
 
 #acceptable
 mat<- matrix(nrow=8, ncol=5)
@@ -107,6 +109,9 @@ for(j in 1:length(sc",i,".mtd)){
   mat[i,]<-vec/5000
 }
 round(mat,2)
+
+write.csv(round(mat,2), paste0("C:/Users/ealger/OneDrive - The Institute of Cancer Research/M/PhD/Trial Designs/PRO_ADD_resubmission/resubmission/tables/supplementary/acceptable.MTD",mtd,".",correlation,".",data,".csv"))
+
 
 #number missing values due to censoring 
 ncens<-matrix(nrow=6, ncol=9)
