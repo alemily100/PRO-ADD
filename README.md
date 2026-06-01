@@ -1,8 +1,8 @@
 # PRO-ADD
 This repository contains the code used to simulate results for the paper **PRO-ADD: Patient-Empowered Dose-Finding Trials by Integrating Safety, Efficacy and Patient-Reported Outcomes for Optimal Dose Selection**. 
 
-**Alger, E., Mandrekar, S. J., Yin, J., & Yap, C. (2026). PRO-ADD: Patient-empowered dose-finding trials integrating safety, preliminary efficacy and patient-reported outcomes for optimal dose selection. Statistical Methods in Medical Research, 09622802261435969.
-**
+**Alger, E., Mandrekar, S. J., Yin, J., & Yap, C. (2026). PRO-ADD: Patient-empowered dose-finding trials integrating safety, preliminary efficacy and patient-reported outcomes for optimal dose selection. Statistical Methods in Medical Research, 09622802261435969.**
+
 ## Background 
 This project evaluates the operating characteristics of the novel PRO-ADD design under simulation scenarios.
 
